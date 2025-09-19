@@ -1,103 +1,73 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import { PropertyManagement, OwnerManagement } from "@/components/organisms";
+import { Button } from "@/components/atoms";
+
+type TabType = "properties" | "owners";
+
+/**
+ * Home Page - Main application page with navigation
+ * Follows Single Responsibility Principle - only handles page-level state and routing
+ */
+export default function HomePage() {
+  const [activeTab, setActiveTab] = useState<TabType>("properties");
+
+  const tabs = [
+    { id: "properties" as TabType, label: "Propiedades", icon: "🏠" },
+    { id: "owners" as TabType, label: "Propietarios", icon: "👤" },
+  ];
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-100 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-300 to-purple-400 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-300 to-cyan-400 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full opacity-10 blur-3xl"></div>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        <header className="mb-12 text-center">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-pink-500 via-purple-600 to-blue-600 rounded-3xl mb-8 shadow-2xl transform hover:scale-110 transition-all duration-300">
+            <span className="text-5xl">🏠</span>
+          </div>
+          <h1 className="text-6xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-6 animate-pulse">
+            Million Project
+          </h1>
+          <p className="text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-medium">
+            🚀 Sistema de gestión de propiedades inmobiliarias con tecnología
+            moderna
+          </p>
+        </header>
+
+        {/* Navigation Tabs */}
+        <div className="mb-12 flex justify-center">
+          <nav className="inline-flex bg-white/90 backdrop-blur-md p-3 rounded-3xl shadow-2xl border-2 border-white/30">
+            {tabs.map((tab) => (
+              <Button
+                key={tab.id}
+                variant={activeTab === tab.id ? "primary" : "ghost"}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-4 px-8 py-4 rounded-2xl transition-all duration-500 font-bold text-lg ${
+                  activeTab === tab.id
+                    ? "bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600 text-white shadow-2xl transform scale-110 hover:scale-115"
+                    : "text-gray-700 hover:text-purple-600 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 hover:shadow-lg transform hover:scale-105"
+                }`}
+              >
+                <span className="text-2xl">{tab.icon}</span>
+                <span>{tab.label}</span>
+              </Button>
+            ))}
+          </nav>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Tab Content */}
+        <main className="animate-fadeIn">
+          {activeTab === "properties" && <PropertyManagement />}
+          {activeTab === "owners" && <OwnerManagement />}
+        </main>
+      </div>
     </div>
   );
 }
