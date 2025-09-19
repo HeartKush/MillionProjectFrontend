@@ -1,6 +1,7 @@
 import React from "react";
-import { Card } from "@/components/atoms";
+import { Card, Button } from "@/components/atoms";
 import { formatCurrency } from "@/lib/utils";
+import { MapPin, Calendar, Home, Eye, Edit, Trash2, Star } from "lucide-react";
 import type { PropertyListItem } from "@/lib/types";
 
 interface PropertyCardProps {
@@ -9,10 +10,11 @@ interface PropertyCardProps {
   onEdit?: (property: PropertyListItem) => void;
   onDelete?: (id: string) => void;
   className?: string;
+  featured?: boolean;
 }
 
 /**
- * PropertyCard Component - Molecular Level
+ * Enhanced PropertyCard Component - Molecular Level
  * Combines Card atom with property-specific content
  * Follows Single Responsibility Principle - only handles property card display
  */
@@ -22,6 +24,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   onEdit,
   onDelete,
   className,
+  featured = false,
 }) => {
   const handleViewDetails = () => {
     if (property.idProperty && onViewDetails) {
@@ -41,67 +44,132 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     }
   };
 
+  const propertyImage = property.imageUrl || "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800";
+
   return (
-    <div
+    <Card
+      variant="elevated"
+      hover={true}
+      padding="none"
+      className={cn(
+        "property-card group relative overflow-hidden",
+        featured && "ring-2 ring-yellow-400 shadow-glow",
+        className
+      )}
       data-testid="property-card"
-      className={`group bg-gradient-to-br from-white via-pink-50 to-purple-50 backdrop-blur-sm rounded-3xl shadow-2xl hover:shadow-3xl border-2 border-white/30 overflow-hidden transition-all duration-500 hover:scale-110 hover:rotate-1 ${className}`}
     >
+      {/* Featured badge */}
+      {featured && (
+        <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 shadow-lg">
+          <Star className="w-4 h-4" />
+          <span>Destacada</span>
+        </div>
+      )}
+
       {/* Image Section */}
       <div className="relative h-56 overflow-hidden">
-        {property.imageUrl ? (
-          <img
-            src={property.imageUrl}
-            alt={property.name || "Propiedad"}
-            className="w-full h-full object-cover group-hover:scale-125 transition-transform duration-700"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 flex items-center justify-center">
-            <span className="text-8xl opacity-60">🏠</span>
-          </div>
-        )}
-        <div className="absolute top-4 right-4">
-          <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-2xl shadow-xl font-bold text-sm">
-            💰 {formatCurrency(property.price)}
+        <img
+          src={propertyImage}
+          alt={property.name || "Propiedad"}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        
+        {/* Price overlay */}
+        <div className="absolute top-4 right-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-xl shadow-lg backdrop-blur-sm">
+          <div className="text-lg font-bold">
+            {formatCurrency(property.price)}
           </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Quick actions overlay */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <div className="flex space-x-3">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleViewDetails}
+              className="bg-white/90 text-gray-800 hover:bg-white backdrop-blur-sm shadow-lg"
+              icon={<Eye className="w-4 h-4" />}
+            >
+              Ver
+            </Button>
+            {onEdit && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleEdit}
+                className="bg-blue-500/90 text-white hover:bg-blue-600 backdrop-blur-sm shadow-lg"
+                icon={<Edit className="w-4 h-4" />}
+              />
+            )}
+            {onDelete && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleDelete}
+                className="bg-red-500/90 text-white hover:bg-red-600 backdrop-blur-sm shadow-lg"
+                icon={<Trash2 className="w-4 h-4" />}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Content Section */}
-      <div className="p-6 bg-gradient-to-br from-white to-pink-50">
-        <h3 className="text-2xl font-black text-gray-900 mb-3 line-clamp-1">
-          🏡 {property.name || "Sin nombre"}
+      <div className="p-6">
+        {/* Property title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors duration-300">
+          {property.name || "Sin nombre"}
         </h3>
-        <p className="text-gray-700 mb-4 line-clamp-2 font-medium">
-          📍 {property.address || "Sin dirección"}
-        </p>
 
-        {/* Actions */}
-        <div className="flex space-x-3">
-          <button
+        {/* Property details */}
+        <div className="space-y-3 mb-4">
+          {/* Address */}
+          <div className="flex items-start space-x-2 text-gray-600">
+            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
+            <span className="text-sm line-clamp-2">
+              {property.address || "Sin dirección"}
+            </span>
+          </div>
+
+          {/* Property type indicator */}
+          <div className="flex items-center space-x-2 text-gray-600">
+            <Home className="w-4 h-4 text-gray-400" />
+            <span className="text-sm">Propiedad Residencial</span>
+          </div>
+        </div>
+
+        {/* Property stats */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="flex items-center space-x-4 text-sm text-gray-500">
+            <div className="flex items-center space-x-1">
+              <Calendar className="w-4 h-4" />
+              <span>Disponible</span>
+            </div>
+          </div>
+
+          {/* Status indicator */}
+          <div className="status-indicator status-available">
+            Disponible
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex space-x-2 mt-4">
+          <Button
+            size="sm"
+            variant="primary"
             onClick={handleViewDetails}
-            className="flex-1 bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:from-pink-600 hover:via-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            fullWidth
+            icon={<Eye className="w-4 h-4" />}
           >
-            👁️ Ver Detalles
-          </button>
-          {onEdit && (
-            <button
-              onClick={handleEdit}
-              className="px-4 py-3 bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-2xl font-bold text-sm hover:from-green-500 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              ✏️
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={handleDelete}
-              className="px-4 py-3 bg-gradient-to-r from-red-400 to-pink-500 text-white rounded-2xl font-bold text-sm hover:from-red-500 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              🗑️
-            </button>
-          )}
+            Ver Detalles
+          </Button>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

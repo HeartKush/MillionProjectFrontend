@@ -1,7 +1,8 @@
-import React from "react";
-import { LoadingSpinner, ErrorMessage } from "@/components/atoms";
+import React, { useState } from "react";
+import { LoadingSpinner, ErrorMessage, Button } from "@/components/atoms";
 import { PropertyCard } from "@/components/molecules";
 import { useProperties } from "@/lib/hooks";
+import { Grid, List, SortAsc, SortDesc, Filter } from "lucide-react";
 import type { PropertyFilters, PropertyListItem } from "@/lib/types";
 
 interface PropertyListProps {
@@ -12,8 +13,11 @@ interface PropertyListProps {
   className?: string;
 }
 
+type ViewMode = "grid" | "list";
+type SortOption = "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
+
 /**
- * PropertyList Component - Organism Level
+ * Enhanced PropertyList Component - Organism Level
  * Combines PropertyCard molecules with data fetching logic
  * Follows Single Responsibility Principle - only handles property list display and data fetching
  */
@@ -24,6 +28,10 @@ export const PropertyList: React.FC<PropertyListProps> = ({
   onDeleteProperty,
   className,
 }) => {
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [showFilters, setShowFilters] = useState(false);
+
   const {
     data: properties,
     isLoading,
@@ -31,28 +39,46 @@ export const PropertyList: React.FC<PropertyListProps> = ({
     refetch,
   } = useProperties(filters);
 
+  // Sort properties based on selected option
+  const sortedProperties = React.useMemo(() => {
+    if (!properties) return [];
+
+    const sorted = [...properties];
+    
+    switch (sortBy) {
+      case "price-asc":
+        return sorted.sort((a, b) => a.price - b.price);
+      case "price-desc":
+        return sorted.sort((a, b) => b.price - a.price);
+      case "name-asc":
+        return sorted.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      case "name-desc":
+        return sorted.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+      case "newest":
+      default:
+        return sorted;
+    }
+  }, [properties, sortBy]);
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <LoadingSpinner size="lg" />
+      <div className="flex flex-col items-center justify-center py-20">
+        <LoadingSpinner size="lg" variant="pulse" text="Cargando propiedades..." />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="py-8">
+      <div className="card-elevated p-8 text-center">
         <ErrorMessage
           message="Error al cargar las propiedades. Por favor, inténtalo de nuevo."
           variant="error"
         />
-        <div className="mt-4 flex justify-center">
-          <button
-            onClick={() => refetch()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
+        <div className="mt-6">
+          <Button onClick={() => refetch()} variant="primary">
             Reintentar
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -60,42 +86,117 @@ export const PropertyList: React.FC<PropertyListProps> = ({
 
   if (!properties || properties.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-500 text-lg mb-4">
-          No se encontraron propiedades
+      <div className="card-elevated p-12 text-center">
+        <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+          <Filter className="w-12 h-12 text-gray-400" />
         </div>
-        <p className="text-gray-400">Intenta ajustar los filtros de búsqueda</p>
+        <h3 className="text-2xl font-bold text-gray-700 mb-4">
+          No se encontraron propiedades
+        </h3>
+        <p className="text-gray-500 mb-6 max-w-md mx-auto">
+          Intenta ajustar los filtros de búsqueda o crear una nueva propiedad para comenzar.
+        </p>
+        <Button variant="primary" onClick={() => window.location.reload()}>
+          Actualizar Lista
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className={`space-y-8 ${className}`}>
-      <div className="flex justify-between items-center">
-        <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100 p-6 rounded-3xl shadow-xl border-2 border-white/50">
-          <h2 className="text-4xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-            🏠 Propiedades
-          </h2>
-          <p className="text-gray-700 text-xl font-bold">
-            ✨ {properties.length}{" "}
-            {properties.length === 1
-              ? "propiedad encontrada"
-              : "propiedades encontradas"}
-          </p>
+    <div className={cn("space-y-6", className)}>
+      {/* Header with stats and controls */}
+      <div className="card-elevated p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* Stats */}
+          <div className="flex items-center space-x-6">
+            <div>
+              <h2 className="text-2xl font-bold gradient-text">
+                Propiedades Disponibles
+              </h2>
+              <p className="text-gray-600">
+                {properties.length} {properties.length === 1 ? "propiedad encontrada" : "propiedades encontradas"}
+              </p>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center space-x-3">
+            {/* Sort dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="form-input py-2 pr-8 text-sm min-w-0"
+            >
+              <option value="newest">Más recientes</option>
+              <option value="price-asc">Precio: Menor a mayor</option>
+              <option value="price-desc">Precio: Mayor a menor</option>
+              <option value="name-asc">Nombre: A-Z</option>
+              <option value="name-desc">Nombre: Z-A</option>
+            </select>
+
+            {/* View mode toggle */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={cn(
+                  "p-2 rounded-md transition-all duration-200",
+                  viewMode === "grid"
+                    ? "bg-white shadow-sm text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                )}
+              >
+                <Grid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={cn(
+                  "p-2 rounded-md transition-all duration-200",
+                  viewMode === "list"
+                    ? "bg-white shadow-sm text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                )}
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        {properties.map((property) => (
-          <PropertyCard
+      {/* Properties grid/list */}
+      <div className={cn(
+        "animate-fadeIn",
+        viewMode === "grid" 
+          ? "property-grid" 
+          : "space-y-4"
+      )}>
+        {sortedProperties.map((property, index) => (
+          <div
             key={property.idProperty}
-            property={property}
-            onViewDetails={onPropertyClick}
-            onEdit={onEditProperty}
-            onDelete={onDeleteProperty}
-          />
+            className="animate-scaleIn"
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <PropertyCard
+              property={property}
+              onViewDetails={onPropertyClick}
+              onEdit={onEditProperty}
+              onDelete={onDeleteProperty}
+              featured={index === 0 && sortBy === "newest"} // Feature the first property when sorted by newest
+              className={viewMode === "list" ? "flex flex-row" : ""}
+            />
+          </div>
         ))}
       </div>
+
+      {/* Load more button (placeholder for pagination) */}
+      {properties.length > 0 && (
+        <div className="text-center pt-8">
+          <Button variant="outline" size="lg">
+            Ver más propiedades
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

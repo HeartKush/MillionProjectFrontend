@@ -3,46 +3,105 @@ import { cn } from "@/lib/utils";
 import type { CardProps } from "@/lib/types";
 
 /**
- * Card Component - Atomic Level
+ * Enhanced Card Component - Atomic Level
  * Follows Single Responsibility Principle - only handles card rendering
  */
-export const Card: React.FC<CardProps> = ({
+export const Card: React.FC<CardProps & {
+  variant?: "elevated" | "glass" | "outline";
+  hover?: boolean;
+  padding?: "none" | "sm" | "md" | "lg";
+}> = ({
   children,
   title,
   subtitle,
   imageUrl,
   actions,
   className,
+  variant = "elevated",
+  hover = true,
+  padding = "md",
   ...props
 }) => {
+  const variantClasses = {
+    elevated: "card-elevated",
+    glass: "card-glass",
+    outline: "border-2 border-gray-200 bg-white/50 backdrop-blur-sm rounded-2xl",
+  };
+
+  const paddingClasses = {
+    none: "",
+    sm: "p-4",
+    md: "p-6",
+    lg: "p-8",
+  };
+
   return (
     <div
       className={cn(
-        "bg-white rounded-lg shadow-md overflow-hidden border border-gray-200",
+        variantClasses[variant],
+        hover && "interactive",
+        "overflow-hidden",
         className
       )}
       {...props}
     >
+      {/* Image section */}
       {imageUrl && (
-        <div className="aspect-w-16 aspect-h-9">
+        <div className="relative aspect-video overflow-hidden">
           <img
             src={imageUrl}
             alt={title || "Card image"}
-            className="w-full h-48 object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
+          <div className="image-overlay" />
+          
+          {/* Image overlay content */}
+          {title && (
+            <div className="absolute bottom-4 left-4 right-4">
+              <h3 className="text-white font-bold text-lg line-clamp-1 drop-shadow-lg">
+                {title}
+              </h3>
+              {subtitle && (
+                <p className="text-white/90 text-sm line-clamp-1 drop-shadow-md">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
-      <div className="p-6">
-        {title && (
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+      {/* Content section */}
+      <div className={cn(paddingClasses[padding])}>
+        {/* Title and subtitle (when no image) */}
+        {!imageUrl && (title || subtitle) && (
+          <div className="mb-4">
+            {title && (
+              <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                {title}
+              </h3>
+            )}
+            {subtitle && (
+              <p className="text-gray-600 line-clamp-2">
+                {subtitle}
+              </p>
+            )}
+          </div>
         )}
 
-        {subtitle && <p className="text-sm text-gray-600 mb-4">{subtitle}</p>}
+        {/* Main content */}
+        {children && (
+          <div className="mb-4 last:mb-0">
+            {children}
+          </div>
+        )}
 
-        {children && <div className="mb-4">{children}</div>}
-
-        {actions && <div className="flex justify-end space-x-2">{actions}</div>}
+        {/* Actions */}
+        {actions && (
+          <div className="flex flex-wrap gap-2 justify-end pt-4 border-t border-gray-100">
+            {actions}
+          </div>
+        )}
       </div>
     </div>
   );

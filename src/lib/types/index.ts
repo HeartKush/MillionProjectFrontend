@@ -23,6 +23,8 @@ export interface OwnerListItem {
   idOwner?: string;
   name?: string;
   photo?: string;
+  address?: string;
+  birthday?: string;
 }
 
 export interface OwnerDetail {
@@ -79,7 +81,7 @@ export interface BaseComponentProps {
 }
 
 export interface ButtonProps extends BaseComponentProps {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
+  variant?: "primary" | "secondary" | "success" | "danger" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   onClick?: () => void;
@@ -104,4 +106,42 @@ export interface CardProps extends BaseComponentProps {
   subtitle?: string;
   imageUrl?: string;
   actions?: React.ReactNode;
+}
+
+// Notification Types
+export interface NotificationProps {
+  id: string;
+  type: "success" | "error" | "warning" | "info";
+  title: string;
+  message?: string;
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+// Theme Types
+export interface ThemeConfig {
+  colors: {
+    primary: string;
+    secondary: string;
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+  };
+  spacing: {
+    xs: string;
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+  };
+  borderRadius: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+  };
 }
