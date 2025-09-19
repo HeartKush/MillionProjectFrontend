@@ -1,0 +1,1 @@
+export { PropertyDetail } from "./PropertyDetail";
