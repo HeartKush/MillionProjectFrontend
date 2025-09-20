@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
@@ -7,13 +9,16 @@ import type { InputProps } from "@/lib/types";
  * Enhanced Input Component - Atomic Level
  * Follows Single Responsibility Principle - only handles input rendering and behavior
  */
-export const Input = React.forwardRef<HTMLInputElement, InputProps & {
-  label?: string;
-  helperText?: string;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  showPasswordToggle?: boolean;
-}>(
+export const Input = React.forwardRef<
+  HTMLInputElement,
+  InputProps & {
+    label?: string;
+    helperText?: string;
+    leftIcon?: React.ReactNode;
+    rightIcon?: React.ReactNode;
+    showPasswordToggle?: boolean;
+  }
+>(
   (
     {
       type = "text",
@@ -90,10 +95,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps & {
 
           {/* Right icon or password toggle */}
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-            {error && (
-              <AlertCircle className="w-5 h-5 text-red-500" />
-            )}
-            
+            {error && <AlertCircle className="w-5 h-5 text-red-500" />}
+
             {showPasswordToggle && type === "password" && (
               <button
                 type="button"
@@ -108,11 +111,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps & {
                 )}
               </button>
             )}
-            
+
             {rightIcon && !error && !showPasswordToggle && (
-              <div className="text-gray-400">
-                {rightIcon}
-              </div>
+              <div className="text-gray-400">{rightIcon}</div>
             )}
           </div>
 
@@ -128,10 +129,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps & {
             {error && (
               <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
             )}
-            <p className={cn(
-              "text-sm",
-              error ? "text-red-600" : "text-gray-500"
-            )}>
+            <p
+              className={cn(
+                "text-sm",
+                error ? "text-red-600" : "text-gray-500"
+              )}
+            >
               {error || helperText}
             </p>
           </div>
