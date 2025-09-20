@@ -1,9 +1,10 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input, Button } from "@/components/atoms";
-import { useOwners } from "@/lib/hooks";
+import { Input, Button, Select } from "@/components/atoms";
 import type {
   CreatePropertyRequest,
   PropertyDetail,
@@ -34,6 +35,8 @@ interface PropertyFormProps {
   onCancel: () => void;
   initialData?: PropertyDetail;
   isLoading?: boolean;
+  owners: OwnerListItem[];
+  ownersLoading?: boolean;
   className?: string;
 }
 
@@ -47,17 +50,10 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
   onCancel,
   initialData,
   isLoading = false,
+  owners,
+  ownersLoading = false,
   className,
 }) => {
-  const [owners, setOwners] = useState<OwnerListItem[]>([]);
-  const { data: ownersData, isLoading: ownersLoading } = useOwners();
-
-  useEffect(() => {
-    if (ownersData) {
-      setOwners(ownersData);
-    }
-  }, [ownersData]);
-
   const {
     register,
     handleSubmit,
@@ -186,33 +182,22 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="idOwner"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Propietario *
-          </label>
-          <select
-            id="idOwner"
-            data-testid="input-ownerId"
-            {...register("idOwner")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            disabled={isLoading || ownersLoading}
-          >
-            <option value="">Seleccionar propietario</option>
-            {owners.map((owner) => (
-              <option key={owner.idOwner} value={owner.idOwner}>
-                {owner.name}
-              </option>
-            ))}
-          </select>
-          {errors.idOwner && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.idOwner.message}
-            </p>
-          )}
-        </div>
+        <Select
+          id="idOwner"
+          data-testid="input-ownerId"
+          label="Propietario"
+          placeholder="Seleccionar"
+          {...register("idOwner")}
+          error={errors.idOwner?.message}
+          disabled={isLoading || ownersLoading}
+          required
+        >
+          {owners.map((owner) => (
+            <option key={owner.idOwner} value={owner.idOwner}>
+              {owner.name}
+            </option>
+          ))}
+        </Select>
       </div>
 
       <div>
