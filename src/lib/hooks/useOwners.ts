@@ -1,15 +1,17 @@
+"use client";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ownerService } from "@/lib/api/ownerService";
-import type { CreateOwnerRequest } from "@/lib/types";
+import type { CreateOwnerRequest, OwnerFilters } from "@/lib/types";
 
 /**
  * Custom hook for owner queries
  * Follows Single Responsibility Principle - only handles owner data fetching
  */
-export const useOwners = (name?: string) => {
+export const useOwners = (filters?: OwnerFilters) => {
   return useQuery({
-    queryKey: ["owners", name],
-    queryFn: () => ownerService.searchOwners(name),
+    queryKey: ["owners", filters],
+    queryFn: () => ownerService.searchOwners(filters?.name),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
   });

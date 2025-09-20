@@ -15,3 +15,5 @@ export {
   useUpdateOwner,
   useDeleteOwner,
 } from "./useOwners";
+
+export { useScrollPosition } from "./useScrollPosition";

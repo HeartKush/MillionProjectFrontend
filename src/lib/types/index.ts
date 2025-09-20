@@ -62,6 +62,11 @@ export interface PropertyFilters {
   maxPrice?: number;
 }
 
+export interface OwnerFilters {
+  name?: string;
+  address?: string;
+}
+
 // UI State Types
 export interface LoadingState {
   isLoading: boolean;
@@ -81,7 +86,13 @@ export interface BaseComponentProps {
 }
 
 export interface ButtonProps extends BaseComponentProps {
-  variant?: "primary" | "secondary" | "success" | "danger" | "outline" | "ghost";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "success"
+    | "danger"
+    | "outline"
+    | "ghost";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   onClick?: () => void;
