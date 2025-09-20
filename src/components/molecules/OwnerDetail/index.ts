@@ -1,0 +1,1 @@
+export { OwnerDetail } from "./OwnerDetail";
