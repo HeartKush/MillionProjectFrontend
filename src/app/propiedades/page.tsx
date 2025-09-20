@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PropertyList, PropertyFilters } from "@/components/organisms";
+import { PropertyList } from "@/components/organisms";
+import { FilterForm } from "@/components/molecules";
 import { PropertyForm } from "@/components/molecules";
 import {
   Modal,
@@ -203,7 +204,7 @@ export default function PropertiesPage() {
 
         {/* Filters */}
         <div className="mb-8">
-          <PropertyFilters
+          <FilterForm
             onFiltersChange={setFilters}
             onClearFilters={handleClearFilters}
             initialFilters={filters}

@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layouts/AppLayout";
-import { OwnerList, OwnerFilters } from "@/components/organisms";
+import { OwnerList } from "@/components/organisms";
+import { OwnerFilterForm } from "@/components/molecules";
 import { OwnerForm } from "@/components/molecules";
 import {
   Modal,
@@ -137,7 +138,7 @@ export default function OwnerListPage() {
 
         {/* Filters */}
         <div className="mb-8">
-          <OwnerFilters onFiltersChange={setFilters} initialFilters={filters} />
+          <OwnerFilterForm onFiltersChange={setFilters} initialFilters={filters} />
         </div>
 
         {/* Content */}
