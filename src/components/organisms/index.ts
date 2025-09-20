@@ -3,5 +3,5 @@ export { PropertyList } from "./PropertyList";
 export { PropertyFilters } from "./PropertyFilters";
 export { PropertyDetailView } from "./PropertyDetailView";
 export { OwnerList } from "./OwnerList";
-export { PropertyManagement } from "./PropertyManagement";
-export { OwnerManagement } from "./OwnerManagement";
+export { OwnerDetailView } from "./OwnerDetailView";
+export { OwnerFilters } from "./OwnerFilters";
