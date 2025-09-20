@@ -1,14 +1,12 @@
 import React from "react";
 import { Card, Button } from "@/components/atoms";
-import { formatCurrency } from "@/lib/utils";
-import { MapPin, Calendar, Home, Eye, Edit, Trash2, Star } from "lucide-react";
+import { formatCurrency, cn } from "@/lib/utils";
+import { MapPin, Calendar, Home, Eye, Star } from "lucide-react";
 import type { PropertyListItem } from "@/lib/types";
 
 interface PropertyCardProps {
   property: PropertyListItem;
   onViewDetails?: (id: string) => void;
-  onEdit?: (property: PropertyListItem) => void;
-  onDelete?: (id: string) => void;
   className?: string;
   featured?: boolean;
 }
@@ -21,8 +19,6 @@ interface PropertyCardProps {
 export const PropertyCard: React.FC<PropertyCardProps> = ({
   property,
   onViewDetails,
-  onEdit,
-  onDelete,
   className,
   featured = false,
 }) => {
@@ -32,19 +28,9 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     }
   };
 
-  const handleEdit = () => {
-    if (onEdit) {
-      onEdit(property);
-    }
-  };
-
-  const handleDelete = () => {
-    if (property.idProperty && onDelete) {
-      onDelete(property.idProperty);
-    }
-  };
-
-  const propertyImage = property.imageUrl || "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800";
+  const propertyImage =
+    property.imageUrl ||
+    "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800";
 
   return (
     <Card
@@ -73,7 +59,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           alt={property.name || "Propiedad"}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        
+
         {/* Price overlay */}
         <div className="absolute top-4 right-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-xl shadow-lg backdrop-blur-sm">
           <div className="text-lg font-bold">
@@ -83,39 +69,6 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
 
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        {/* Quick actions overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <div className="flex space-x-3">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleViewDetails}
-              className="bg-white/90 text-gray-800 hover:bg-white backdrop-blur-sm shadow-lg"
-              icon={<Eye className="w-4 h-4" />}
-            >
-              Ver
-            </Button>
-            {onEdit && (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleEdit}
-                className="bg-blue-500/90 text-white hover:bg-blue-600 backdrop-blur-sm shadow-lg"
-                icon={<Edit className="w-4 h-4" />}
-              />
-            )}
-            {onDelete && (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleDelete}
-                className="bg-red-500/90 text-white hover:bg-red-600 backdrop-blur-sm shadow-lg"
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Content Section */}
@@ -152,9 +105,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           </div>
 
           {/* Status indicator */}
-          <div className="status-indicator status-available">
-            Disponible
-          </div>
+          <div className="status-indicator status-available">Disponible</div>
         </div>
 
         {/* Action buttons */}

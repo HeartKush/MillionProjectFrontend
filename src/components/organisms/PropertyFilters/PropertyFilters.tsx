@@ -22,7 +22,7 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
 }) => {
   return (
     <div
-      className={`bg-white p-6 rounded-lg shadow-md border border-gray-200 ${className}`}
+      className={`bg-white p-6 rounded-lg shadow-md  ${className}`}
     >
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">

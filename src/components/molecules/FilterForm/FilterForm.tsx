@@ -1,9 +1,12 @@
+"use client";
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input, Button } from "@/components/atoms";
-import { Search, MapPin, DollarSign, RotateCcw, Filter } from "lucide-react";
+import { MapPin, DollarSign, RotateCcw, Filter, Home } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { PropertyFilters } from "@/lib/types";
 
 const filterSchema = z.object({
@@ -92,8 +95,12 @@ export const FilterForm: React.FC<FilterFormProps> = ({
           <Filter className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-gray-900">Filtros de Búsqueda</h3>
-          <p className="text-sm text-gray-500">Encuentra la propiedad perfecta</p>
+          <h3 className="text-lg font-bold text-gray-900">
+            Filtros de Búsqueda
+          </h3>
+          <p className="text-sm text-gray-500">
+            Encuentra la propiedad perfecta
+          </p>
         </div>
       </div>
 
@@ -110,7 +117,7 @@ export const FilterForm: React.FC<FilterFormProps> = ({
             data-testid="input-name"
             label="Nombre de la Propiedad"
             placeholder="Buscar por nombre..."
-            leftIcon={<Search className="w-4 h-4" />}
+            leftIcon={<Home className="w-4 h-4" />}
             {...register("name")}
             error={errors.name?.message}
           />
@@ -152,24 +159,15 @@ export const FilterForm: React.FC<FilterFormProps> = ({
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+        <div className="flex justify-end pt-4 border-t border-gray-100">
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={handleClear}
             icon={<RotateCcw className="w-4 h-4" />}
-            className="sm:w-auto"
+            className="text-blue-600 hover:text-blue-500 hover:bg-blue-50"
           >
             Limpiar Filtros
-          </Button>
-          
-          <Button
-            type="submit"
-            variant="primary"
-            icon={<Search className="w-4 h-4" />}
-            className="sm:w-auto"
-          >
-            Buscar Propiedades
           </Button>
         </div>
       </form>
