@@ -15,6 +15,7 @@ interface PropertyTraceModalProps {
   initialData?: PropertyTraceListItem;
   isLoading?: boolean;
   propertyId: string;
+  propertyValue?: number; // Valor de la propiedad para pre-cargar
 }
 
 /**
@@ -29,6 +30,7 @@ export const PropertyTraceModal: React.FC<PropertyTraceModalProps> = ({
   initialData,
   isLoading = false,
   propertyId,
+  propertyValue,
 }) => {
   const handleFormSubmit = (data: CreatePropertyTraceRequest) => {
     // Ensure the property ID is set
@@ -52,6 +54,7 @@ export const PropertyTraceModal: React.FC<PropertyTraceModalProps> = ({
           onCancel={onClose}
           initialData={initialData}
           isLoading={isLoading}
+          propertyValue={propertyValue}
         />
       </div>
     </Modal>

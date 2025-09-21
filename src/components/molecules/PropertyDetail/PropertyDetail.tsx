@@ -213,6 +213,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
         initialData={selectedTrace}
         isLoading={isLoading}
         propertyId={property.idProperty!}
+        propertyValue={property.price}
       />
     </div>
   );

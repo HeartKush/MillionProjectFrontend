@@ -5,8 +5,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input, Button } from "@/components/atoms";
-import { Calendar, DollarSign, User, Receipt, Calculator, Info } from "lucide-react";
-import { formatCurrency, calculatePropertyTransferTax, formatUVT, getBracketDescription } from "@/lib/utils";
+import {
+  Calendar,
+  DollarSign,
+  User,
+  Receipt,
+  Calculator,
+  Info,
+} from "lucide-react";
+import {
+  formatCurrency,
+  calculatePropertyTransferTax,
+  formatUVT,
+  getBracketDescription,
+} from "@/lib/utils";
 import type {
   CreatePropertyTraceRequest,
   PropertyTraceListItem,
@@ -27,6 +39,7 @@ interface PropertyTraceFormProps {
   onCancel: () => void;
   initialData?: PropertyTraceListItem;
   isLoading?: boolean;
+  propertyValue?: number; // Valor de la propiedad para pre-cargar
   className?: string;
 }
 
@@ -40,10 +53,11 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
   onCancel,
   initialData,
   isLoading = false,
+  propertyValue,
   className,
 }) => {
   const [showTaxBreakdown, setShowTaxBreakdown] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -63,7 +77,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
       : {
           dateSale: new Date().toISOString().split("T")[0], // Today's date
           name: "",
-          value: 0,
+          value: propertyValue || 0,
           tax: 0,
           idProperty: "",
         },
@@ -71,7 +85,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
 
   // Watch the value field for automatic tax calculation
   const watchedValue = watch("value");
-  
+
   // Calculate tax automatically when value changes
   useEffect(() => {
     if (watchedValue && watchedValue > 0) {
@@ -81,9 +95,10 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
   }, [watchedValue, setValue]);
 
   // Get current tax calculation for display
-  const currentTaxCalculation = watchedValue && watchedValue > 0 
-    ? calculatePropertyTransferTax(watchedValue) 
-    : null;
+  const currentTaxCalculation =
+    watchedValue && watchedValue > 0
+      ? calculatePropertyTransferTax(watchedValue)
+      : null;
 
   const handleFormSubmit = (data: PropertyTraceFormData) => {
     onSubmit({
@@ -151,16 +166,17 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
           <Input
             id="value"
             type="number"
-            label="Valor de Venta"
+            label="Valor de Venta de la Propiedad"
             placeholder="0"
             leftIcon={<DollarSign className="w-4 h-4" />}
             {...register("value", { valueAsNumber: true })}
             error={errors.value?.message}
-            disabled={isLoading}
-            required
-            min="0"
-            step="0.01"
+            disabled={true}
+            className="bg-gray-50"
           />
+          <p className="mt-1 text-xs text-gray-500">
+            Este valor se toma automáticamente del precio de venta de la propiedad
+          </p>
         </div>
 
         {/* Tax - Auto-calculated */}
@@ -168,15 +184,12 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
           <Input
             id="tax"
             type="number"
-            label="Impuestos (Calculado automáticamente)"
+            label="Impuestos"
             placeholder="0"
             leftIcon={<Calculator className="w-4 h-4" />}
             {...register("tax", { valueAsNumber: true })}
             error={errors.tax?.message}
             disabled={true}
-            required
-            min="0"
-            step="0.01"
             className="bg-gray-50"
           />
           {currentTaxCalculation && (
@@ -204,32 +217,40 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
             <Calculator className="w-4 h-4 mr-2" />
             Desglose del Cálculo de Impuestos
           </h4>
-          
+
           <div className="space-y-3 text-sm">
             {/* Property Value */}
             <div className="flex justify-between">
               <span className="text-gray-600">Valor de la propiedad:</span>
-              <span className="font-medium">{formatCurrency(currentTaxCalculation.valueInCOP)}</span>
+              <span className="font-medium">
+                {formatCurrency(currentTaxCalculation.valueInCOP)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-gray-600">Equivalente en UVT:</span>
-              <span className="font-medium">{formatUVT(currentTaxCalculation.valueInUVT)} UVT</span>
+              <span className="font-medium">
+                {formatUVT(currentTaxCalculation.valueInUVT)} UVT
+              </span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-gray-600">Franja de impuestos:</span>
-              <span className="font-medium text-blue-700">{getBracketDescription(currentTaxCalculation.bracket)}</span>
+              <span className="font-medium text-blue-700">
+                {getBracketDescription(currentTaxCalculation.bracket)}
+              </span>
             </div>
-            
+
             <hr className="border-blue-200" />
-            
+
             {/* Breakdown based on bracket */}
-            {currentTaxCalculation.bracket === 'exempt' && (
+            {currentTaxCalculation.bracket === "exempt" && (
               <div className="text-green-700">
                 <div className="flex justify-between">
                   <span>Valor exento:</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.valueInCOP)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(currentTaxCalculation.valueInCOP)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Impuesto a pagar:</span>
@@ -237,55 +258,93 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
                 </div>
               </div>
             )}
-            
-            {currentTaxCalculation.bracket === 'low' && currentTaxCalculation.breakdown && (
-              <div className="text-blue-700">
-                <div className="flex justify-between">
-                  <span>Valor exento (hasta 20,000 UVT):</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.exemptAmount!)}</span>
+
+            {currentTaxCalculation.bracket === "low" &&
+              currentTaxCalculation.breakdown && (
+                <div className="text-blue-700">
+                  <div className="flex justify-between">
+                    <span>Valor exento (hasta 20,000 UVT):</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.exemptAmount!
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Valor gravado (1.5%):</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.lowBracketAmount!
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Impuesto (1.5%):</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.lowBracketTax!
+                      )}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Valor gravado (1.5%):</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketAmount!)}</span>
+              )}
+
+            {currentTaxCalculation.bracket === "high" &&
+              currentTaxCalculation.breakdown && (
+                <div className="text-purple-700">
+                  <div className="flex justify-between">
+                    <span>Valor exento (hasta 20,000 UVT):</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.exemptAmount!
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Franja baja (1.5%):</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.lowBracketAmount!
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Franja alta (3%):</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.highBracketAmount!
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Impuesto franja baja:</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.lowBracketTax!
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Impuesto franja alta:</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.highBracketTax!
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Monto fijo (450 UVT):</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        currentTaxCalculation.breakdown.fixedAmount!
+                      )}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Impuesto (1.5%):</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketTax!)}</span>
-                </div>
-              </div>
-            )}
-            
-            {currentTaxCalculation.bracket === 'high' && currentTaxCalculation.breakdown && (
-              <div className="text-purple-700">
-                <div className="flex justify-between">
-                  <span>Valor exento (hasta 20,000 UVT):</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.exemptAmount!)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Franja baja (1.5%):</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketAmount!)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Franja alta (3%):</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.highBracketAmount!)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Impuesto franja baja:</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketTax!)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Impuesto franja alta:</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.highBracketTax!)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Monto fijo (450 UVT):</span>
-                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.fixedAmount!)}</span>
-                </div>
-              </div>
-            )}
-            
+              )}
+
             <hr className="border-blue-200" />
-            
+
             <div className="flex justify-between font-semibold text-blue-900">
               <span>Total impuesto a pagar:</span>
               <span>{formatCurrency(currentTaxCalculation.taxAmount)}</span>
