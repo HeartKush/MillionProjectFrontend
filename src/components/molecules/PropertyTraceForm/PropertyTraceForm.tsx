@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input, Button } from "@/components/atoms";
-import { Calendar, DollarSign, User, Receipt } from "lucide-react";
+import { Calendar, DollarSign, User, Receipt, Calculator, Info } from "lucide-react";
+import { formatCurrency, calculatePropertyTransferTax, formatUVT, getBracketDescription } from "@/lib/utils";
 import type {
   CreatePropertyTraceRequest,
   PropertyTraceListItem,
@@ -41,9 +42,13 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
   isLoading = false,
   className,
 }) => {
+  const [showTaxBreakdown, setShowTaxBreakdown] = useState(false);
+  
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<PropertyTraceFormData>({
     resolver: zodResolver(propertyTraceSchema),
@@ -63,6 +68,22 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
           idProperty: "",
         },
   });
+
+  // Watch the value field for automatic tax calculation
+  const watchedValue = watch("value");
+  
+  // Calculate tax automatically when value changes
+  useEffect(() => {
+    if (watchedValue && watchedValue > 0) {
+      const taxCalculation = calculatePropertyTransferTax(watchedValue);
+      setValue("tax", taxCalculation.taxAmount);
+    }
+  }, [watchedValue, setValue]);
+
+  // Get current tax calculation for display
+  const currentTaxCalculation = watchedValue && watchedValue > 0 
+    ? calculatePropertyTransferTax(watchedValue) 
+    : null;
 
   const handleFormSubmit = (data: PropertyTraceFormData) => {
     onSubmit({
@@ -142,26 +163,136 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
           />
         </div>
 
-        {/* Tax */}
+        {/* Tax - Auto-calculated */}
         <div>
           <Input
             id="tax"
             type="number"
-            label="Impuestos"
+            label="Impuestos (Calculado automáticamente)"
             placeholder="0"
-            leftIcon={<Receipt className="w-4 h-4" />}
+            leftIcon={<Calculator className="w-4 h-4" />}
             {...register("tax", { valueAsNumber: true })}
             error={errors.tax?.message}
-            disabled={isLoading}
+            disabled={true}
             required
             min="0"
             step="0.01"
+            className="bg-gray-50"
           />
+          {currentTaxCalculation && (
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={() => setShowTaxBreakdown(!showTaxBreakdown)}
+                className="flex items-center text-sm text-blue-600 hover:text-blue-500"
+              >
+                <Info className="w-4 h-4 mr-1" />
+                Ver desglose del cálculo
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Property ID (hidden field) */}
         <input type="hidden" {...register("idProperty")} />
       </div>
+
+      {/* Tax Breakdown */}
+      {showTaxBreakdown && currentTaxCalculation && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-blue-900 mb-3 flex items-center">
+            <Calculator className="w-4 h-4 mr-2" />
+            Desglose del Cálculo de Impuestos
+          </h4>
+          
+          <div className="space-y-3 text-sm">
+            {/* Property Value */}
+            <div className="flex justify-between">
+              <span className="text-gray-600">Valor de la propiedad:</span>
+              <span className="font-medium">{formatCurrency(currentTaxCalculation.valueInCOP)}</span>
+            </div>
+            
+            <div className="flex justify-between">
+              <span className="text-gray-600">Equivalente en UVT:</span>
+              <span className="font-medium">{formatUVT(currentTaxCalculation.valueInUVT)} UVT</span>
+            </div>
+            
+            <div className="flex justify-between">
+              <span className="text-gray-600">Franja de impuestos:</span>
+              <span className="font-medium text-blue-700">{getBracketDescription(currentTaxCalculation.bracket)}</span>
+            </div>
+            
+            <hr className="border-blue-200" />
+            
+            {/* Breakdown based on bracket */}
+            {currentTaxCalculation.bracket === 'exempt' && (
+              <div className="text-green-700">
+                <div className="flex justify-between">
+                  <span>Valor exento:</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.valueInCOP)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Impuesto a pagar:</span>
+                  <span className="font-medium">$0 COP</span>
+                </div>
+              </div>
+            )}
+            
+            {currentTaxCalculation.bracket === 'low' && currentTaxCalculation.breakdown && (
+              <div className="text-blue-700">
+                <div className="flex justify-between">
+                  <span>Valor exento (hasta 20,000 UVT):</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.exemptAmount!)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Valor gravado (1.5%):</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketAmount!)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Impuesto (1.5%):</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketTax!)}</span>
+                </div>
+              </div>
+            )}
+            
+            {currentTaxCalculation.bracket === 'high' && currentTaxCalculation.breakdown && (
+              <div className="text-purple-700">
+                <div className="flex justify-between">
+                  <span>Valor exento (hasta 20,000 UVT):</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.exemptAmount!)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Franja baja (1.5%):</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketAmount!)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Franja alta (3%):</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.highBracketAmount!)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Impuesto franja baja:</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.lowBracketTax!)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Impuesto franja alta:</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.highBracketTax!)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Monto fijo (450 UVT):</span>
+                  <span className="font-medium">{formatCurrency(currentTaxCalculation.breakdown.fixedAmount!)}</span>
+                </div>
+              </div>
+            )}
+            
+            <hr className="border-blue-200" />
+            
+            <div className="flex justify-between font-semibold text-blue-900">
+              <span>Total impuesto a pagar:</span>
+              <span>{formatCurrency(currentTaxCalculation.taxAmount)}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Form Actions */}
       <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
