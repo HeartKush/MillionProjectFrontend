@@ -12,7 +12,7 @@ import type {
  * Follows Interface Segregation Principle - only exposes owner-related methods
  */
 export interface IOwnerService {
-  searchOwners(name?: string): Promise<OwnerListItem[]>;
+  searchOwners(name?: string, address?: string): Promise<OwnerListItem[]>;
   getOwnerById(id: string): Promise<OwnerDetail | null>;
   createOwner(owner: CreateOwnerRequest): Promise<{ id: string }>;
   updateOwner(id: string, owner: CreateOwnerRequest): Promise<{ id: string }>;
@@ -26,11 +26,12 @@ export interface IOwnerService {
 export class OwnerService implements IOwnerService {
   private readonly baseEndpoint = API_ENDPOINTS.OWNERS;
 
-  async searchOwners(name?: string): Promise<OwnerListItem[]> {
+  async searchOwners(name?: string, address?: string): Promise<OwnerListItem[]> {
     try {
       const queryParams = new URLSearchParams();
 
       if (name) queryParams.append("name", name);
+      if (address) queryParams.append("address", address);
 
       const queryString = queryParams.toString();
       const url = queryString

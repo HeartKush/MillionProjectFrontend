@@ -11,7 +11,7 @@ import type { CreateOwnerRequest, OwnerFilters } from "@/lib/types";
 export const useOwners = (filters?: OwnerFilters) => {
   return useQuery({
     queryKey: ["owners", filters],
-    queryFn: () => ownerService.searchOwners(filters?.name),
+    queryFn: () => ownerService.searchOwners(filters?.name, filters?.address),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
   });

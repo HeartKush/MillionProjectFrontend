@@ -138,7 +138,10 @@ export default function OwnerListPage() {
 
         {/* Filters */}
         <div className="mb-8">
-          <OwnerFilterForm onFiltersChange={setFilters} initialFilters={filters} />
+          <OwnerFilterForm
+            onFiltersChange={setFilters}
+            initialFilters={filters}
+          />
         </div>
 
         {/* Content */}
