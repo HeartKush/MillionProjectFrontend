@@ -4,6 +4,8 @@ export { FilterForm } from "./FilterForm";
 export { OwnerFilterForm } from "./OwnerFilterForm";
 export { PropertyDetail } from "./PropertyDetail";
 export { PropertyTraceList } from "./PropertyTraceList";
+export { PropertyTraceForm } from "./PropertyTraceForm";
+export { PropertyTraceModal } from "./PropertyTraceModal";
 export { OwnerDetail } from "./OwnerDetail";
 export { OwnerForm } from "./OwnerForm";
 export { PropertyForm } from "./PropertyForm";

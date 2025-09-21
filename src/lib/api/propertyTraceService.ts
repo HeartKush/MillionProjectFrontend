@@ -12,7 +12,12 @@ import type {
  */
 export interface IPropertyTraceService {
   getByPropertyId(propertyId: string): Promise<PropertyTraceListItem[]>;
-  createPropertyTrace(trace: CreatePropertyTraceRequest): Promise<{ id: string }>;
+  getById(traceId: string): Promise<PropertyTraceListItem | null>;
+  createPropertyTrace(
+    trace: CreatePropertyTraceRequest
+  ): Promise<{ id: string }>;
+  updatePropertyTrace(traceId: string, trace: CreatePropertyTraceRequest): Promise<void>;
+  deletePropertyTrace(traceId: string): Promise<void>;
 }
 
 /**
@@ -40,7 +45,25 @@ export class PropertyTraceService implements IPropertyTraceService {
     }
   }
 
-  async createPropertyTrace(trace: CreatePropertyTraceRequest): Promise<{ id: string }> {
+  async getById(traceId: string): Promise<PropertyTraceListItem | null> {
+    if (!traceId) {
+      throw new Error("Trace ID is required");
+    }
+
+    try {
+      return await httpClient.get<PropertyTraceListItem>(`${this.baseEndpoint}/${traceId}`);
+    } catch (error) {
+      console.error("Error fetching property trace:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return null;
+      }
+      throw new Error("Failed to fetch property trace");
+    }
+  }
+
+  async createPropertyTrace(
+    trace: CreatePropertyTraceRequest
+  ): Promise<{ id: string }> {
     if (!trace.idProperty) {
       throw new Error("Property ID is required");
     }
@@ -50,6 +73,36 @@ export class PropertyTraceService implements IPropertyTraceService {
     } catch (error) {
       console.error("Error creating property trace:", error);
       throw new Error("Failed to create property trace");
+    }
+  }
+
+  async updatePropertyTrace(traceId: string, trace: CreatePropertyTraceRequest): Promise<void> {
+    if (!traceId) {
+      throw new Error("Trace ID is required");
+    }
+
+    if (!trace.idProperty) {
+      throw new Error("Property ID is required");
+    }
+
+    try {
+      await httpClient.put(`${this.baseEndpoint}/${traceId}`, trace);
+    } catch (error) {
+      console.error("Error updating property trace:", error);
+      throw new Error("Failed to update property trace");
+    }
+  }
+
+  async deletePropertyTrace(traceId: string): Promise<void> {
+    if (!traceId) {
+      throw new Error("Trace ID is required");
+    }
+
+    try {
+      await httpClient.delete(`${this.baseEndpoint}/${traceId}`);
+    } catch (error) {
+      console.error("Error deleting property trace:", error);
+      throw new Error("Failed to delete property trace");
     }
   }
 }

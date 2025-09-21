@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Calendar, DollarSign, User, Receipt } from "lucide-react";
-import { LoadingSpinner } from "@/components/atoms";
+import { Calendar, DollarSign, User, Receipt, Edit, Trash2, Plus } from "lucide-react";
+import { LoadingSpinner, Button } from "@/components/atoms";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { PropertyTraceListItem } from "@/lib/types";
@@ -12,6 +12,9 @@ interface PropertyTraceListProps {
   isLoading?: boolean;
   error?: string;
   className?: string;
+  onEdit?: (trace: PropertyTraceListItem) => void;
+  onDelete?: (traceId: string) => void;
+  onCreate?: () => void;
 }
 
 /**
@@ -24,6 +27,9 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
   isLoading,
   error,
   className,
+  onEdit,
+  onDelete,
+  onCreate,
 }) => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("es-CO", {
@@ -90,18 +96,32 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
   return (
     <div className={`card-elevated p-6 ${className}`}>
       {/* Header */}
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl flex items-center justify-center">
-          <Receipt className="w-5 h-5 text-white" />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl flex items-center justify-center">
+            <Receipt className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">
+              Historial de Transacciones
+            </h3>
+            <p className="text-sm text-gray-500">
+              {traces.length}{" "}
+              {traces.length === 1 ? "transacción" : "transacciones"} registrada
+              {traces.length === 1 ? "" : "s"}
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-bold text-gray-900">
-            Historial de Transacciones
-          </h3>
-          <p className="text-sm text-gray-500">
-            {traces.length} {traces.length === 1 ? "transacción" : "transacciones"} registrada{traces.length === 1 ? "" : "s"}
-          </p>
-        </div>
+        {onCreate && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={onCreate}
+            icon={<Plus className="w-4 h-4" />}
+          >
+            Nueva Transacción
+          </Button>
+        )}
       </div>
 
       {/* Traces List */}
@@ -111,51 +131,79 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
             key={trace.idPropertyTrace || index}
             className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-gray-300 transition-colors duration-200"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Date and Buyer */}
-              <div className="space-y-3">
+            <div className="flex justify-between items-start">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+                {/* Date and Buyer */}
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Fecha de venta</p>
+                      <p className="font-medium text-gray-900">
+                        {formatDate(trace.dateSale)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {trace.name && (
+                    <div className="flex items-center space-x-2">
+                      <User className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm text-gray-500">Comprador</p>
+                        <p className="font-medium text-gray-900">{trace.name}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Value */}
                 <div className="flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-gray-500" />
+                  <DollarSign className="w-4 h-4 text-green-600" />
                   <div>
-                    <p className="text-sm text-gray-500">Fecha de venta</p>
-                    <p className="font-medium text-gray-900">
-                      {formatDate(trace.dateSale)}
+                    <p className="text-sm text-gray-500">Valor de venta</p>
+                    <p className="font-bold text-green-600 text-lg">
+                      {formatCurrency(trace.value)}
                     </p>
                   </div>
                 </div>
-                
-                {trace.name && (
-                  <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Comprador</p>
-                      <p className="font-medium text-gray-900">{trace.name}</p>
-                    </div>
+
+                {/* Tax */}
+                <div className="flex items-center space-x-2">
+                  <Receipt className="w-4 h-4 text-blue-600" />
+                  <div>
+                    <p className="text-sm text-gray-500">Impuestos</p>
+                    <p className="font-medium text-blue-600">
+                      {formatCurrency(trace.tax)}
+                    </p>
                   </div>
-                )}
-              </div>
-
-              {/* Value */}
-              <div className="flex items-center space-x-2">
-                <DollarSign className="w-4 h-4 text-green-600" />
-                <div>
-                  <p className="text-sm text-gray-500">Valor de venta</p>
-                  <p className="font-bold text-green-600 text-lg">
-                    {formatCurrency(trace.value)}
-                  </p>
                 </div>
               </div>
 
-              {/* Tax */}
-              <div className="flex items-center space-x-2">
-                <Receipt className="w-4 h-4 text-blue-600" />
-                <div>
-                  <p className="text-sm text-gray-500">Impuestos</p>
-                  <p className="font-medium text-blue-600">
-                    {formatCurrency(trace.tax)}
-                  </p>
+              {/* Action Buttons */}
+              {(onEdit || onDelete) && (
+                <div className="flex space-x-2 ml-4">
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(trace)}
+                      icon={<Edit className="w-4 h-4" />}
+                      className="text-blue-600 hover:text-blue-500"
+                      title="Editar transacción"
+                    />
+                  )}
+                  {onDelete && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(trace.idPropertyTrace!)}
+                      icon={<Trash2 className="w-4 h-4" />}
+                      className="text-red-600 hover:text-red-500"
+                      title="Eliminar transacción"
+                    />
+                  )}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         ))}

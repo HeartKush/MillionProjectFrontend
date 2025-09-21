@@ -1,13 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/atoms";
-import { PropertyTraceList } from "@/components/molecules";
-import { usePropertyTraces } from "@/lib/hooks/usePropertyTraces";
+import { PropertyTraceList, PropertyTraceModal } from "@/components/molecules";
+import { 
+  usePropertyTraces, 
+  useCreatePropertyTrace, 
+  useUpdatePropertyTrace, 
+  useDeletePropertyTrace 
+} from "@/lib/hooks/usePropertyTraces";
 import { Edit, Trash2 } from "lucide-react";
-import type { PropertyDetail as PropertyDetailType } from "@/lib/types";
+import type { PropertyDetail as PropertyDetailType, PropertyTraceListItem, CreatePropertyTraceRequest } from "@/lib/types";
 
 interface PropertyDetailProps {
   property: PropertyDetailType;
@@ -30,7 +35,67 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   className,
 }) => {
   const router = useRouter();
-  const { data: traces, isLoading: tracesLoading, error: tracesError } = usePropertyTraces(property.idProperty);
+  const {
+    data: traces,
+    isLoading: tracesLoading,
+    error: tracesError,
+  } = usePropertyTraces(property.idProperty);
+
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTrace, setSelectedTrace] = useState<PropertyTraceListItem | undefined>();
+
+  // CRUD mutations
+  const createTraceMutation = useCreatePropertyTrace();
+  const updateTraceMutation = useUpdatePropertyTrace();
+  const deleteTraceMutation = useDeletePropertyTrace();
+
+  // Modal handlers
+  const handleCreateTrace = () => {
+    setSelectedTrace(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditTrace = (trace: PropertyTraceListItem) => {
+    setSelectedTrace(trace);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTrace(undefined);
+  };
+
+  // CRUD handlers
+  const handleSubmitTrace = async (data: CreatePropertyTraceRequest) => {
+    try {
+      if (selectedTrace) {
+        // Update existing trace
+        await updateTraceMutation.mutateAsync({
+          traceId: selectedTrace.idPropertyTrace!,
+          trace: data,
+        });
+      } else {
+        // Create new trace
+        await createTraceMutation.mutateAsync(data);
+      }
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error saving trace:", error);
+    }
+  };
+
+  const handleDeleteTrace = async (traceId: string) => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar esta transacción?")) {
+      try {
+        await deleteTraceMutation.mutateAsync(traceId);
+      } catch (error) {
+        console.error("Error deleting trace:", error);
+      }
+    }
+  };
+
+  const isLoading = createTraceMutation.isPending || updateTraceMutation.isPending || deleteTraceMutation.isPending;
 
   return (
     <div className={className}>
@@ -123,8 +188,21 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
           traces={traces || []}
           isLoading={tracesLoading}
           error={tracesError?.message}
+          onCreate={handleCreateTrace}
+          onEdit={handleEditTrace}
+          onDelete={handleDeleteTrace}
         />
       </div>
+
+      {/* Property Trace Modal */}
+      <PropertyTraceModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitTrace}
+        initialData={selectedTrace}
+        isLoading={isLoading}
+        propertyId={property.idProperty!}
+      />
     </div>
   );
 };
