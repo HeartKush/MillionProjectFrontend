@@ -4,6 +4,8 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/atoms";
+import { PropertyTraceList } from "@/components/molecules";
+import { usePropertyTraces } from "@/lib/hooks/usePropertyTraces";
 import { Edit, Trash2 } from "lucide-react";
 import type { PropertyDetail as PropertyDetailType } from "@/lib/types";
 
@@ -28,6 +30,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   className,
 }) => {
   const router = useRouter();
+  const { data: traces, isLoading: tracesLoading, error: tracesError } = usePropertyTraces(property.idProperty);
 
   return (
     <div className={className}>
@@ -112,6 +115,15 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Property Trace History */}
+      <div className="mt-8">
+        <PropertyTraceList
+          traces={traces || []}
+          isLoading={tracesLoading}
+          error={tracesError?.message}
+        />
       </div>
     </div>
   );

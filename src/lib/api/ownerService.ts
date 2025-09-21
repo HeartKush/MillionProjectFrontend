@@ -26,7 +26,10 @@ export interface IOwnerService {
 export class OwnerService implements IOwnerService {
   private readonly baseEndpoint = API_ENDPOINTS.OWNERS;
 
-  async searchOwners(name?: string, address?: string): Promise<OwnerListItem[]> {
+  async searchOwners(
+    name?: string,
+    address?: string
+  ): Promise<OwnerListItem[]> {
     try {
       const queryParams = new URLSearchParams();
 

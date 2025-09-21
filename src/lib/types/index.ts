@@ -35,6 +35,23 @@ export interface OwnerDetail {
   birthday?: string;
 }
 
+export interface PropertyTraceListItem {
+  idPropertyTrace?: string;
+  dateSale: string;
+  name?: string;
+  value: number;
+  tax: number;
+  idProperty?: string;
+}
+
+export interface CreatePropertyTraceRequest {
+  dateSale: string;
+  name?: string;
+  value: number;
+  tax: number;
+  idProperty?: string;
+}
+
 // API Request Types
 export interface CreatePropertyRequest {
   name?: string;
