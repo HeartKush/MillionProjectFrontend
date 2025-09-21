@@ -59,8 +59,13 @@ export const useUpdatePropertyTrace = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ traceId, trace }: { traceId: string; trace: CreatePropertyTraceRequest }) =>
-      propertyTraceService.updatePropertyTrace(traceId, trace),
+    mutationFn: ({
+      traceId,
+      trace,
+    }: {
+      traceId: string;
+      trace: CreatePropertyTraceRequest;
+    }) => propertyTraceService.updatePropertyTrace(traceId, trace),
     onSuccess: (_, variables) => {
       // Invalidate and refetch property traces for the specific property
       queryClient.invalidateQueries({
@@ -84,7 +89,8 @@ export const useDeletePropertyTrace = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (traceId: string) => propertyTraceService.deletePropertyTrace(traceId),
+    mutationFn: (traceId: string) =>
+      propertyTraceService.deletePropertyTrace(traceId),
     onSuccess: (_, traceId) => {
       // Invalidate all property traces queries
       queryClient.invalidateQueries({

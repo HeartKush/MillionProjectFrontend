@@ -1,7 +1,15 @@
 "use client";
 
 import React from "react";
-import { Calendar, DollarSign, User, Receipt, Edit, Trash2, Plus } from "lucide-react";
+import {
+  Calendar,
+  DollarSign,
+  User,
+  Receipt,
+  Edit,
+  Trash2,
+  Plus,
+} from "lucide-react";
 import { LoadingSpinner, Button } from "@/components/atoms";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -78,6 +86,34 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
   if (!traces || traces.length === 0) {
     return (
       <div className={`card-elevated p-6 ${className}`}>
+        {/* Header with Create Button */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl flex items-center justify-center">
+              <Receipt className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">
+                Historial de Transacciones
+              </h3>
+              <p className="text-sm text-gray-500">
+                0 transacciones registradas
+              </p>
+            </div>
+          </div>
+          {onCreate && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onCreate}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              Nueva Transacción
+            </Button>
+          )}
+        </div>
+
+        {/* Empty State */}
         <div className="text-center py-8">
           <div className="text-gray-400 mb-4">
             <Receipt className="w-16 h-16 mx-auto" />
@@ -150,7 +186,9 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
                       <User className="w-4 h-4 text-gray-500" />
                       <div>
                         <p className="text-sm text-gray-500">Comprador</p>
-                        <p className="font-medium text-gray-900">{trace.name}</p>
+                        <p className="font-medium text-gray-900">
+                          {trace.name}
+                        </p>
                       </div>
                     </div>
                   )}

@@ -5,14 +5,18 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/atoms";
 import { PropertyTraceList, PropertyTraceModal } from "@/components/molecules";
-import { 
-  usePropertyTraces, 
-  useCreatePropertyTrace, 
-  useUpdatePropertyTrace, 
-  useDeletePropertyTrace 
+import {
+  usePropertyTraces,
+  useCreatePropertyTrace,
+  useUpdatePropertyTrace,
+  useDeletePropertyTrace,
 } from "@/lib/hooks/usePropertyTraces";
 import { Edit, Trash2 } from "lucide-react";
-import type { PropertyDetail as PropertyDetailType, PropertyTraceListItem, CreatePropertyTraceRequest } from "@/lib/types";
+import type {
+  PropertyDetail as PropertyDetailType,
+  PropertyTraceListItem,
+  CreatePropertyTraceRequest,
+} from "@/lib/types";
 
 interface PropertyDetailProps {
   property: PropertyDetailType;
@@ -43,7 +47,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTrace, setSelectedTrace] = useState<PropertyTraceListItem | undefined>();
+  const [selectedTrace, setSelectedTrace] = useState<
+    PropertyTraceListItem | undefined
+  >();
 
   // CRUD mutations
   const createTraceMutation = useCreatePropertyTrace();
@@ -86,7 +92,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   };
 
   const handleDeleteTrace = async (traceId: string) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta transacción?")) {
+    if (
+      window.confirm("¿Estás seguro de que quieres eliminar esta transacción?")
+    ) {
       try {
         await deleteTraceMutation.mutateAsync(traceId);
       } catch (error) {
@@ -95,7 +103,10 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
     }
   };
 
-  const isLoading = createTraceMutation.isPending || updateTraceMutation.isPending || deleteTraceMutation.isPending;
+  const isLoading =
+    createTraceMutation.isPending ||
+    updateTraceMutation.isPending ||
+    deleteTraceMutation.isPending;
 
   return (
     <div className={className}>

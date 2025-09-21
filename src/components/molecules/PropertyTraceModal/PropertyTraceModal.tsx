@@ -3,7 +3,10 @@
 import React from "react";
 import { Modal } from "@/components/atoms";
 import { PropertyTraceForm } from "@/components/molecules";
-import type { CreatePropertyTraceRequest, PropertyTraceListItem } from "@/lib/types";
+import type {
+  CreatePropertyTraceRequest,
+  PropertyTraceListItem,
+} from "@/lib/types";
 
 interface PropertyTraceModalProps {
   isOpen: boolean;

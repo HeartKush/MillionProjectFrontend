@@ -16,7 +16,10 @@ export interface IPropertyTraceService {
   createPropertyTrace(
     trace: CreatePropertyTraceRequest
   ): Promise<{ id: string }>;
-  updatePropertyTrace(traceId: string, trace: CreatePropertyTraceRequest): Promise<void>;
+  updatePropertyTrace(
+    traceId: string,
+    trace: CreatePropertyTraceRequest
+  ): Promise<void>;
   deletePropertyTrace(traceId: string): Promise<void>;
 }
 
@@ -51,7 +54,9 @@ export class PropertyTraceService implements IPropertyTraceService {
     }
 
     try {
-      return await httpClient.get<PropertyTraceListItem>(`${this.baseEndpoint}/${traceId}`);
+      return await httpClient.get<PropertyTraceListItem>(
+        `${this.baseEndpoint}/${traceId}`
+      );
     } catch (error) {
       console.error("Error fetching property trace:", error);
       if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -76,7 +81,10 @@ export class PropertyTraceService implements IPropertyTraceService {
     }
   }
 
-  async updatePropertyTrace(traceId: string, trace: CreatePropertyTraceRequest): Promise<void> {
+  async updatePropertyTrace(
+    traceId: string,
+    trace: CreatePropertyTraceRequest
+  ): Promise<void> {
     if (!traceId) {
       throw new Error("Trace ID is required");
     }
