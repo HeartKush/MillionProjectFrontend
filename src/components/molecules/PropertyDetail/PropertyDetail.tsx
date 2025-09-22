@@ -79,7 +79,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
     console.log("handleSubmitTrace called with data:", data);
     console.log("selectedTrace:", selectedTrace);
     console.log("property.idProperty:", property.idProperty);
-    
+
     try {
       if (selectedTrace) {
         // Update existing trace

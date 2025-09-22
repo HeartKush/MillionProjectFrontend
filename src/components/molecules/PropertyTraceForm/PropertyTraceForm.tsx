@@ -89,8 +89,11 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
   // Calculate tax automatically when value changes
   useEffect(() => {
     if (watchedValue && watchedValue > 0) {
+      console.log("Calculating tax for value:", watchedValue);
       const taxCalculation = calculatePropertyTransferTax(watchedValue);
+      console.log("Tax calculation result:", taxCalculation);
       setValue("tax", taxCalculation.taxAmount);
+      console.log("Tax field set to:", taxCalculation.taxAmount);
     }
   }, [watchedValue, setValue]);
 
@@ -102,6 +105,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
 
   const handleFormSubmit = (data: PropertyTraceFormData) => {
     console.log("PropertyTraceForm handleFormSubmit called with data:", data);
+    console.log("Form validation errors:", errors);
     const submitData = {
       dateSale: data.dateSale,
       name: data.name || undefined,
