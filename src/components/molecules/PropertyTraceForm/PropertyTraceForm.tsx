@@ -175,7 +175,8 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
             className="bg-gray-50"
           />
           <p className="mt-1 text-xs text-gray-500">
-            Este valor se toma automáticamente del precio de venta de la propiedad
+            Este valor se toma automáticamente del precio de venta de la
+            propiedad
           </p>
         </div>
 

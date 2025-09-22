@@ -42,6 +42,7 @@ export class PropertyService implements IPropertyService {
         queryParams.append("minPrice", filters.minPrice.toString());
       if (filters.maxPrice !== undefined && !isNaN(filters.maxPrice))
         queryParams.append("maxPrice", filters.maxPrice.toString());
+      if (filters.idOwner) queryParams.append("idOwner", filters.idOwner);
 
       const queryString = queryParams.toString();
       const url = queryString

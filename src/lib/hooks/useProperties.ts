@@ -36,6 +36,19 @@ export const useProperty = (id: string | undefined) => {
 };
 
 /**
+ * Custom hook for fetching properties by owner ID
+ */
+export const usePropertiesByOwner = (ownerId: string | undefined) => {
+  return useQuery({
+    queryKey: ["properties", "byOwner", ownerId],
+    queryFn: () => propertyService.searchProperties({ idOwner: ownerId! }),
+    enabled: !!ownerId,
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+  });
+};
+
+/**
  * Custom hook for creating properties
  */
 export const useCreateProperty = () => {

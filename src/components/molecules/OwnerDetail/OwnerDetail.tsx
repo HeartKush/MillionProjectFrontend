@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/atoms";
+import { PropertyListByOwner } from "@/components/molecules";
 import { Edit, Trash2, Users, UserCheck, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -150,6 +151,14 @@ export const OwnerDetail: React.FC<OwnerDetailProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Owner's Properties */}
+      <div className="mt-8">
+        <PropertyListByOwner
+          ownerId={owner.idOwner!}
+          ownerName={owner.name}
+        />
       </div>
     </div>
   );

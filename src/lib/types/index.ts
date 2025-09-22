@@ -77,6 +77,7 @@ export interface PropertyFilters {
   address?: string;
   minPrice?: number;
   maxPrice?: number;
+  idOwner?: string; // Filter properties by owner ID
 }
 
 export interface OwnerFilters {
