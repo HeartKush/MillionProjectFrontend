@@ -56,7 +56,9 @@ export const OwnerForm: React.FC<OwnerFormProps> = ({
         name: initialData.name || "",
         address: initialData.address || "",
         photo: initialData.photo || "",
-        birthday: initialData.birthday ? initialData.birthday.split("T")[0] : "",
+        birthday: initialData.birthday
+          ? initialData.birthday.split("T")[0]
+          : "",
       });
     }
   }, [initialData, reset]);
