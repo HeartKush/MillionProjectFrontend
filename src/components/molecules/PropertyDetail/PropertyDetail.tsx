@@ -76,9 +76,14 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
 
   // CRUD handlers
   const handleSubmitTrace = async (data: CreatePropertyTraceRequest) => {
+    console.log("handleSubmitTrace called with data:", data);
+    console.log("selectedTrace:", selectedTrace);
+    console.log("property.idProperty:", property.idProperty);
+    
     try {
       if (selectedTrace) {
         // Update existing trace
+        console.log("Updating existing trace...");
         await updateTraceMutation.mutateAsync({
           traceId: selectedTrace.idPropertyTrace!,
           trace: data,
@@ -89,6 +94,8 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
         );
       } else {
         // Create new trace
+        console.log("Creating new trace...");
+        console.log("Data being sent:", data);
         await createTraceMutation.mutateAsync(data);
         showSuccess(
           "Transacción creada",
@@ -98,6 +105,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
       handleCloseModal();
     } catch (error) {
       console.error("Error saving trace:", error);
+      console.error("Error details:", error);
       showError(
         "Error al guardar",
         "No se pudo guardar la transacción. Inténtalo de nuevo."
