@@ -6,6 +6,7 @@ export interface PropertyListItem {
   address?: string;
   price: number;
   imageUrl?: string;
+  createdAt: string;
 }
 
 export interface PropertyDetail {
@@ -17,6 +18,8 @@ export interface PropertyDetail {
   codeInternal?: string;
   year: number;
   imageUrl?: string;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface OwnerListItem {
@@ -25,6 +28,7 @@ export interface OwnerListItem {
   photo?: string;
   address?: string;
   birthday?: string;
+  createdAt: string;
 }
 
 export interface OwnerDetail {
@@ -33,6 +37,8 @@ export interface OwnerDetail {
   address?: string;
   photo?: string;
   birthday?: string;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface PropertyTraceListItem {

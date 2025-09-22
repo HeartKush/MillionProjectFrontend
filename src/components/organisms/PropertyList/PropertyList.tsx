@@ -54,7 +54,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({
         );
       case "newest":
       default:
-        return sorted;
+        return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
   }, [properties, sortBy]);
 

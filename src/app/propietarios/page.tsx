@@ -37,11 +37,11 @@ export default function OwnerListPage() {
     const total = owners.length;
     const active = owners.length; // Assuming all are active for now
     const recent = owners.filter((owner) => {
-      if (!owner.birthday) return false;
-      const birthDate = new Date(owner.birthday);
+      if (!owner.createdAt) return false;
+      const createdDate = new Date(owner.createdAt);
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      return birthDate > oneMonthAgo;
+      return createdDate > oneMonthAgo;
     }).length;
 
     return { total, active, recent };
