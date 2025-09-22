@@ -1,13 +1,12 @@
 import React from "react";
 import { Card, Button } from "@/components/atoms";
 import { formatCurrency, cn } from "@/lib/utils";
-import { MapPin, Calendar, Home, Eye, Star, Trash2 } from "lucide-react";
+import { MapPin, Calendar, Home, Eye, Star } from "lucide-react";
 import type { PropertyListItem } from "@/lib/types";
 
 interface PropertyCardProps {
   property: PropertyListItem;
   onViewDetails?: (id: string) => void;
-  onDelete?: (id: string) => void;
   className?: string;
   featured?: boolean;
   layout?: "grid" | "list";
@@ -21,7 +20,6 @@ interface PropertyCardProps {
 export const PropertyCard: React.FC<PropertyCardProps> = ({
   property,
   onViewDetails,
-  onDelete,
   className,
   featured = false,
   layout = "grid",
@@ -29,12 +27,6 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   const handleViewDetails = () => {
     if (property.idProperty && onViewDetails) {
       onViewDetails(property.idProperty);
-    }
-  };
-
-  const handleDelete = () => {
-    if (property.idProperty && onDelete) {
-      onDelete(property.idProperty);
     }
   };
 
@@ -131,14 +123,6 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             >
               Ver Detalles
             </Button>
-            {onDelete && (
-              <Button
-                size="sm"
-                variant="danger"
-                onClick={handleDelete}
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            )}
           </div>
         </div>
       </Card>
@@ -234,14 +218,6 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
               >
                 Ver Detalles
               </Button>
-              {onDelete && (
-                <Button
-                  size="sm"
-                  variant="danger"
-                  onClick={handleDelete}
-                  icon={<Trash2 className="w-4 h-4" />}
-                />
-              )}
             </div>
           </div>
         </div>

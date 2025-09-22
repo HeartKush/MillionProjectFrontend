@@ -2,13 +2,12 @@
 
 import React from "react";
 import { Button, Card } from "@/components/atoms";
-import { Eye, Trash2 } from "lucide-react";
+import { Eye } from "lucide-react";
 import type { OwnerListItem } from "@/lib/types";
 
 interface OwnerListProps {
   owners: OwnerListItem[];
   onViewOwner?: (id: string) => void;
-  onDeleteOwner?: (id: string) => void;
   className?: string;
 }
 
@@ -20,7 +19,6 @@ interface OwnerListProps {
 export const OwnerList: React.FC<OwnerListProps> = ({
   owners,
   onViewOwner,
-  onDeleteOwner,
   className,
 }) => {
   if (owners.length === 0) {
@@ -45,27 +43,17 @@ export const OwnerList: React.FC<OwnerListProps> = ({
             title={owner.name || "Sin nombre"}
             subtitle={owner.address || "Sin dirección"}
             actions={
-              <div className="flex space-x-2">
-                {onViewOwner && owner.idOwner && (
-                  <Button
-                    size="sm"
-                    variant="primary"
-                    onClick={() => onViewOwner(owner.idOwner!)}
-                    icon={<Eye className="w-4 h-4" />}
-                    fullWidth
-                  >
-                    Ver Detalles
-                  </Button>
-                )}
-                {onDeleteOwner && owner.idOwner && (
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => onDeleteOwner(owner.idOwner!)}
-                    icon={<Trash2 className="w-4 h-4" />}
-                  />
-                )}
-              </div>
+              onViewOwner && owner.idOwner ? (
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => onViewOwner(owner.idOwner!)}
+                  icon={<Eye className="w-4 h-4" />}
+                  fullWidth
+                >
+                  Ver Detalles
+                </Button>
+              ) : undefined
             }
             variant="elevated"
             padding="sm"

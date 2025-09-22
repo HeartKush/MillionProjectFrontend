@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PropertyList } from "@/components/organisms";
-import { FilterForm, ConfirmModal } from "@/components/molecules";
+import { FilterForm } from "@/components/molecules";
 import { PropertyForm } from "@/components/molecules";
 import {
   Modal,
@@ -14,8 +14,6 @@ import {
 import {
   useProperties,
   useCreateProperty,
-  useDeleteProperty,
-  useUpdateProperty,
   useOwners,
 } from "@/lib/hooks";
 import { Plus, Home, TrendingUp, Users, DollarSign } from "lucide-react";
@@ -36,12 +34,6 @@ export default function PropertiesPage() {
   const { showSuccess, showError } = useToastHelpers();
   const [filters, setFilters] = useState<PropertyFiltersType>({});
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [propertyToDelete, setPropertyToDelete] = useState<string | null>(null);
-  const [editingProperty, setEditingProperty] = useState<PropertyDetail | null>(
-    null
-  );
 
   const {
     data: properties,
@@ -51,8 +43,6 @@ export default function PropertiesPage() {
   } = useProperties(filters);
   const { data: owners, isLoading: ownersLoading } = useOwners();
   const createPropertyMutation = useCreateProperty();
-  const updatePropertyMutation = useUpdateProperty();
-  const deletePropertyMutation = useDeleteProperty();
 
   // Calculate stats
   const stats = React.useMemo(() => {
@@ -76,54 +66,6 @@ export default function PropertiesPage() {
     router.push(`/propiedades/${propertyId}`);
   };
 
-  const handleEditProperty = (property: PropertyListItem) => {
-    // Convert PropertyListItem to PropertyDetail format
-    const propertyDetail: PropertyDetail = {
-      idProperty: property.idProperty,
-      name: property.name,
-      address: property.address,
-      price: property.price,
-      codeInternal: "", // Will be filled from API
-      year: new Date().getFullYear(), // Default value
-      idOwner: property.idOwner || "",
-      imageUrl: property.imageUrl,
-    };
-    setEditingProperty(propertyDetail);
-    setIsEditModalOpen(true);
-  };
-
-  const handleDeleteProperty = (propertyId: string) => {
-    setPropertyToDelete(propertyId);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (propertyToDelete) {
-      deletePropertyMutation.mutate(propertyToDelete, {
-        onSuccess: () => {
-          showSuccess(
-            "Propiedad eliminada",
-            "La propiedad ha sido eliminada correctamente."
-          );
-          setIsDeleteModalOpen(false);
-          setPropertyToDelete(null);
-          refetch();
-        },
-        onError: (error) => {
-          showError(
-            "Error al eliminar",
-            "No se pudo eliminar la propiedad. Inténtalo de nuevo."
-          );
-        },
-      });
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setPropertyToDelete(null);
-  };
-
   const handleCreateSubmit = (data: any) => {
     createPropertyMutation.mutate(data, {
       onSuccess: () => {
@@ -143,30 +85,6 @@ export default function PropertiesPage() {
     });
   };
 
-  const handleEditSubmit = (data: any) => {
-    if (editingProperty?.idProperty) {
-      updatePropertyMutation.mutate(
-        { id: editingProperty.idProperty, property: data },
-        {
-          onSuccess: () => {
-            showSuccess(
-              "Propiedad actualizada",
-              "Los cambios han sido guardados correctamente."
-            );
-            setIsEditModalOpen(false);
-            setEditingProperty(null);
-            refetch();
-          },
-          onError: (error) => {
-            showError(
-              "Error al actualizar",
-              "No se pudieron guardar los cambios. Inténtalo de nuevo."
-            );
-          },
-        }
-      );
-    }
-  };
 
   const handleClearFilters = () => {
     setFilters({});
@@ -280,7 +198,6 @@ export default function PropertiesPage() {
           <PropertyList
             properties={properties || []}
             onPropertyClick={handlePropertyClick}
-            onDeleteProperty={handleDeleteProperty}
           />
         )}
 
@@ -299,36 +216,6 @@ export default function PropertiesPage() {
             ownersLoading={ownersLoading}
           />
         </Modal>
-
-        {/* Edit Property Modal */}
-        <Modal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          title="Editar Propiedad"
-          size="lg"
-        >
-          <PropertyForm
-            onSubmit={handleEditSubmit}
-            onCancel={() => setIsEditModalOpen(false)}
-            initialData={editingProperty || undefined}
-            isLoading={updatePropertyMutation.isPending}
-            owners={owners || []}
-            ownersLoading={ownersLoading}
-          />
-        </Modal>
-
-        {/* Delete Property Confirmation Modal */}
-        <ConfirmModal
-          isOpen={isDeleteModalOpen}
-          onClose={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
-          title="Eliminar Propiedad"
-          message="¿Estás seguro de que quieres eliminar esta propiedad? Esta acción no se puede deshacer."
-          confirmText="Eliminar"
-          cancelText="Cancelar"
-          variant="danger"
-          isLoading={deletePropertyMutation.isPending}
-        />
       </div>
     </AppLayout>
   );

@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layouts/AppLayout";
 import { OwnerList } from "@/components/organisms";
 import { OwnerFilterForm } from "@/components/molecules";
-import { OwnerForm, ConfirmModal } from "@/components/molecules";
+import { OwnerForm } from "@/components/molecules";
 import {
   Modal,
   Button,
   LoadingSpinner,
   ErrorMessage,
 } from "@/components/atoms";
-import { useOwners, useCreateOwner, useDeleteOwner } from "@/lib/hooks";
+import { useOwners, useCreateOwner } from "@/lib/hooks";
 import { Plus, Users, UserCheck, Calendar } from "lucide-react";
 import type { CreateOwnerRequest, OwnerFilters } from "@/lib/types";
 import { useToastHelpers } from "@/contexts/ToastContext";
@@ -25,13 +25,10 @@ export default function OwnerListPage() {
   const router = useRouter();
   const { showSuccess, showError } = useToastHelpers();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [ownerToDelete, setOwnerToDelete] = useState<string | null>(null);
   const [filters, setFilters] = useState<OwnerFilters>({});
 
   const { data: owners, isLoading, error, refetch } = useOwners(filters);
   const createOwnerMutation = useCreateOwner();
-  const deleteOwnerMutation = useDeleteOwner();
 
   // Calculate stats
   const stats = React.useMemo(() => {
@@ -56,38 +53,6 @@ export default function OwnerListPage() {
 
   const handleViewOwner = (ownerId: string) => {
     router.push(`/propietarios/${ownerId}`);
-  };
-
-  const handleDeleteOwner = (ownerId: string) => {
-    setOwnerToDelete(ownerId);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (ownerToDelete) {
-      deleteOwnerMutation.mutate(ownerToDelete, {
-        onSuccess: () => {
-          showSuccess(
-            "Propietario eliminado",
-            "El propietario ha sido eliminado correctamente."
-          );
-          setIsDeleteModalOpen(false);
-          setOwnerToDelete(null);
-          refetch();
-        },
-        onError: (error) => {
-          showError(
-            "Error al eliminar",
-            "No se pudo eliminar el propietario. Inténtalo de nuevo."
-          );
-        },
-      });
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setOwnerToDelete(null);
   };
 
   const handleCreateSubmit = (data: CreateOwnerRequest) => {
@@ -215,8 +180,7 @@ export default function OwnerListPage() {
         ) : (
           <OwnerList 
             owners={owners || []} 
-            onViewOwner={handleViewOwner} 
-            onDeleteOwner={handleDeleteOwner}
+            onViewOwner={handleViewOwner}
           />
         )}
 
@@ -233,19 +197,6 @@ export default function OwnerListPage() {
             isLoading={createOwnerMutation.isPending}
           />
         </Modal>
-
-        {/* Delete Owner Confirmation Modal */}
-        <ConfirmModal
-          isOpen={isDeleteModalOpen}
-          onClose={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
-          title="Eliminar Propietario"
-          message="¿Estás seguro de que quieres eliminar este propietario? Esta acción no se puede deshacer."
-          confirmText="Eliminar"
-          cancelText="Cancelar"
-          variant="danger"
-          isLoading={deleteOwnerMutation.isPending}
-        />
       </div>
     </AppLayout>
   );
