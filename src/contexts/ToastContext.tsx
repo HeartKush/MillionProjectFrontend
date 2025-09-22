@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import type { ToastProps, ToastType } from "@/components/atoms/Toast";
 
 interface ToastContextType {
@@ -26,7 +32,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       id,
       onClose: (id: string) => removeToast(id),
     };
-    
+
     setToasts((prev) => [...prev, newToast]);
   }, []);
 
@@ -39,7 +45,9 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast, clearToasts }}>
+    <ToastContext.Provider
+      value={{ toasts, addToast, removeToast, clearToasts }}
+    >
       {children}
     </ToastContext.Provider>
   );
@@ -57,41 +65,53 @@ export const useToast = () => {
 export const useToastHelpers = () => {
   const { addToast } = useToast();
 
-  const showSuccess = useCallback((title: string, message?: string) => {
-    addToast({
-      type: "success",
-      title,
-      message,
-      duration: 4000,
-    });
-  }, [addToast]);
+  const showSuccess = useCallback(
+    (title: string, message?: string) => {
+      addToast({
+        type: "success",
+        title,
+        message,
+        duration: 4000,
+      });
+    },
+    [addToast]
+  );
 
-  const showError = useCallback((title: string, message?: string) => {
-    addToast({
-      type: "error",
-      title,
-      message,
-      duration: 6000,
-    });
-  }, [addToast]);
+  const showError = useCallback(
+    (title: string, message?: string) => {
+      addToast({
+        type: "error",
+        title,
+        message,
+        duration: 6000,
+      });
+    },
+    [addToast]
+  );
 
-  const showWarning = useCallback((title: string, message?: string) => {
-    addToast({
-      type: "warning",
-      title,
-      message,
-      duration: 5000,
-    });
-  }, [addToast]);
+  const showWarning = useCallback(
+    (title: string, message?: string) => {
+      addToast({
+        type: "warning",
+        title,
+        message,
+        duration: 5000,
+      });
+    },
+    [addToast]
+  );
 
-  const showInfo = useCallback((title: string, message?: string) => {
-    addToast({
-      type: "info",
-      title,
-      message,
-      duration: 4000,
-    });
-  }, [addToast]);
+  const showInfo = useCallback(
+    (title: string, message?: string) => {
+      addToast({
+        type: "info",
+        title,
+        message,
+        duration: 4000,
+      });
+    },
+    [addToast]
+  );
 
   return {
     showSuccess,

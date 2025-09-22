@@ -4,16 +4,15 @@ import React, { useState } from "react";
 import { Home, Users, Menu, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { ToastContainer, useToast } from "@/components/atoms";
-import { ToastProvider } from "@/contexts/ToastContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
 
 /**
- * Internal layout component that has access to toast context
+ * App Layout - Shared layout component with navigation and toast support
  */
-const AppLayoutInternal: React.FC<AppLayoutProps> = ({ children }) => {
+export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -171,13 +170,3 @@ const AppLayoutInternal: React.FC<AppLayoutProps> = ({ children }) => {
   );
 };
 
-/**
- * App Layout - Shared layout component with navigation and toast support
- */
-export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  return (
-    <ToastProvider>
-      <AppLayoutInternal>{children}</AppLayoutInternal>
-    </ToastProvider>
-  );
-};

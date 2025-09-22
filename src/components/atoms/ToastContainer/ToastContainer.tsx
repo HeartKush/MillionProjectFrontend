@@ -24,11 +24,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
       aria-label="Notificaciones"
     >
       {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          {...toast}
-          onClose={onClose}
-        />
+        <Toast key={toast.id} {...toast} onClose={onClose} />
       ))}
     </div>
   );

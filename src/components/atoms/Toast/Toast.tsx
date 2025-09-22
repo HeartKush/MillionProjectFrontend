@@ -69,14 +69,12 @@ export const Toast: React.FC<ToastProps> = ({
       <div className="flex-shrink-0">
         <Icon className={cn("w-5 h-5", iconStyles[type])} />
       </div>
-      
+
       <div className="ml-3 flex-1">
         <h3 className="text-sm font-medium">{title}</h3>
-        {message && (
-          <p className="mt-1 text-sm opacity-90">{message}</p>
-        )}
+        {message && <p className="mt-1 text-sm opacity-90">{message}</p>}
       </div>
-      
+
       <button
         onClick={() => onClose(id)}
         className="flex-shrink-0 ml-4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
