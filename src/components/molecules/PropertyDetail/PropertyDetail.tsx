@@ -11,6 +11,7 @@ import {
   useUpdatePropertyTrace,
   useDeletePropertyTrace,
 } from "@/lib/hooks/usePropertyTraces";
+import { useToastHelpers } from "@/contexts/ToastContext";
 import { Edit, Trash2 } from "lucide-react";
 import type {
   PropertyDetail as PropertyDetailType,
@@ -39,6 +40,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   className,
 }) => {
   const router = useRouter();
+  const { showSuccess, showError } = useToastHelpers();
   const {
     data: traces,
     isLoading: tracesLoading,
@@ -81,13 +83,25 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
           traceId: selectedTrace.idPropertyTrace!,
           trace: data,
         });
+        showSuccess(
+          "Transacción actualizada",
+          "La transacción ha sido actualizada correctamente."
+        );
       } else {
         // Create new trace
         await createTraceMutation.mutateAsync(data);
+        showSuccess(
+          "Transacción creada",
+          "La nueva transacción ha sido creada correctamente."
+        );
       }
       handleCloseModal();
     } catch (error) {
       console.error("Error saving trace:", error);
+      showError(
+        "Error al guardar",
+        "No se pudo guardar la transacción. Inténtalo de nuevo."
+      );
     }
   };
 
@@ -97,8 +111,16 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
     ) {
       try {
         await deleteTraceMutation.mutateAsync(traceId);
+        showSuccess(
+          "Transacción eliminada",
+          "La transacción ha sido eliminada correctamente."
+        );
       } catch (error) {
         console.error("Error deleting trace:", error);
+        showError(
+          "Error al eliminar",
+          "No se pudo eliminar la transacción. Inténtalo de nuevo."
+        );
       }
     }
   };
