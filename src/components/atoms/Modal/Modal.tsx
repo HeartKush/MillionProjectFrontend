@@ -71,28 +71,10 @@ export const Modal: React.FC<ModalProps> = ({
         >
           {/* Header */}
           {title && (
-            <div className="flex items-center justify-between border-b border-gray-200/50 px-8 py-6 bg-gradient-to-r from-gray-50 to-blue-50">
+            <div className="flex items-center border-b border-gray-200/50 px-8 py-6 bg-gradient-to-r from-gray-50 to-blue-50">
               <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
                 {title}
               </h3>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl p-2 hover:bg-gray-100 transition-colors duration-200"
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
             </div>
           )}
 
