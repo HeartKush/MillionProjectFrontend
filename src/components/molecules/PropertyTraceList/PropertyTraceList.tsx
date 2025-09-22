@@ -167,7 +167,7 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
             key={trace.idPropertyTrace || index}
             className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-gray-300 transition-colors duration-200"
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
                 {/* Date and Buyer */}
                 <div className="space-y-3">
@@ -227,7 +227,6 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
                       onClick={() => onEdit(trace)}
                       icon={<Edit className="w-4 h-4" />}
                       className="text-blue-600 hover:text-blue-500"
-                      title="Editar transacción"
                     />
                   )}
                   {onDelete && (
@@ -237,7 +236,6 @@ export const PropertyTraceList: React.FC<PropertyTraceListProps> = ({
                       onClick={() => onDelete(trace.idPropertyTrace!)}
                       icon={<Trash2 className="w-4 h-4" />}
                       className="text-red-600 hover:text-red-500"
-                      title="Eliminar transacción"
                     />
                   )}
                 </div>

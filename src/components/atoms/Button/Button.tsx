@@ -42,6 +42,14 @@ export const Button: React.FC<ButtonProps & {
     lg: "px-8 py-4 text-lg rounded-xl gap-3",
   };
 
+  // Special handling for icon-only buttons
+  const isIconOnly = icon && !children;
+  const iconOnlySizeClasses = {
+    sm: "p-2 min-w-[2.5rem] min-h-[2.5rem]",
+    md: "p-3 min-w-[3rem] min-h-[3rem]",
+    lg: "p-4 min-w-[3.5rem] min-h-[3.5rem]",
+  };
+
   const isDisabled = disabled || loading;
 
   return (
@@ -53,7 +61,7 @@ export const Button: React.FC<ButtonProps & {
       className={cn(
         baseClasses,
         variantClasses[variant],
-        sizeClasses[size],
+        isIconOnly ? iconOnlySizeClasses[size] : sizeClasses[size],
         fullWidth && "w-full",
         className
       )}
