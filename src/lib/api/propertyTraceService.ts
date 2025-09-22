@@ -72,14 +72,17 @@ export class PropertyTraceService implements IPropertyTraceService {
     console.log("PropertyTraceService.createPropertyTrace called with:", trace);
     console.log("Base endpoint:", this.baseEndpoint);
     console.log("Full URL:", `${API_BASE_URL}${this.baseEndpoint}`);
-    
+
     if (!trace.idProperty) {
       throw new Error("Property ID is required");
     }
 
     try {
       console.log("Making POST request to create property trace...");
-      const result = await httpClient.post<{ id: string }>(this.baseEndpoint, trace);
+      const result = await httpClient.post<{ id: string }>(
+        this.baseEndpoint,
+        trace
+      );
       console.log("Property trace created successfully:", result);
       return result;
     } catch (error) {

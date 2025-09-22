@@ -55,6 +55,7 @@ export const PropertyTraceModal: React.FC<PropertyTraceModalProps> = ({
           initialData={initialData}
           isLoading={isLoading}
           propertyValue={propertyValue}
+          propertyId={propertyId}
         />
       </div>
     </Modal>

@@ -40,6 +40,7 @@ interface PropertyTraceFormProps {
   initialData?: PropertyTraceListItem;
   isLoading?: boolean;
   propertyValue?: number; // Valor de la propiedad para pre-cargar
+  propertyId?: string; // ID de la propiedad para pre-cargar
   className?: string;
 }
 
@@ -54,6 +55,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
   initialData,
   isLoading = false,
   propertyValue,
+  propertyId,
   className,
 }) => {
   const [showTaxBreakdown, setShowTaxBreakdown] = useState(false);
@@ -79,7 +81,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
           name: "",
           value: propertyValue || 0,
           tax: 0,
-          idProperty: "",
+          idProperty: propertyId || "",
         },
   });
 
@@ -101,13 +103,20 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
       : null;
 
   const handleFormSubmit = (data: PropertyTraceFormData) => {
-    onSubmit({
+    console.log("PropertyTraceForm handleFormSubmit called with data:", data);
+    console.log("Form validation errors:", errors);
+    console.log("PropertyId from props:", propertyId);
+    
+    const submitData = {
       dateSale: data.dateSale,
       name: data.name || undefined,
       value: data.value,
       tax: data.tax,
       idProperty: data.idProperty,
-    });
+    };
+    
+    console.log("PropertyTraceForm calling onSubmit with:", submitData);
+    onSubmit(submitData);
   };
 
   return (
