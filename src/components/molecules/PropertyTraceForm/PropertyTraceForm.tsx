@@ -60,6 +60,17 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
 }) => {
   const [showTaxBreakdown, setShowTaxBreakdown] = useState(false);
 
+  // Helper function to format date for HTML date input
+  const formatDateForInput = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split("T")[0];
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return new Date().toISOString().split("T")[0];
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -70,7 +81,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
     resolver: zodResolver(propertyTraceSchema),
     defaultValues: initialData
       ? {
-          dateSale: initialData.dateSale,
+          dateSale: formatDateForInput(initialData.dateSale),
           name: initialData.name || "",
           value: initialData.value,
           tax: initialData.tax,
@@ -87,6 +98,17 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
 
   // Watch the value field for automatic tax calculation
   const watchedValue = watch("value");
+
+  // Update form values when initialData changes (for editing)
+  useEffect(() => {
+    if (initialData) {
+      setValue("dateSale", formatDateForInput(initialData.dateSale));
+      setValue("name", initialData.name || "");
+      setValue("value", initialData.value);
+      setValue("tax", initialData.tax);
+      setValue("idProperty", initialData.idProperty || "");
+    }
+  }, [initialData, setValue]);
 
   // Calculate tax automatically when value changes
   useEffect(() => {
