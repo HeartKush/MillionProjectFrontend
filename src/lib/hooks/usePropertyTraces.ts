@@ -13,7 +13,7 @@ export const usePropertyTraces = (propertyId: string | undefined) => {
     queryKey: ["propertyTraces", propertyId],
     queryFn: () => propertyTraceService.getByPropertyId(propertyId!),
     enabled: !!propertyId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     retry: 2,
   });
 };
@@ -26,7 +26,7 @@ export const usePropertyTrace = (traceId: string | undefined) => {
     queryKey: ["propertyTrace", traceId],
     queryFn: () => propertyTraceService.getById(traceId!),
     enabled: !!traceId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     retry: 2,
   });
 };
@@ -41,11 +41,9 @@ export const useCreatePropertyTrace = () => {
     mutationFn: (trace: CreatePropertyTraceRequest) =>
       propertyTraceService.createPropertyTrace(trace),
     onSuccess: (_, variables) => {
-      // Invalidate and refetch property traces for the specific property
       queryClient.invalidateQueries({
         queryKey: ["propertyTraces", variables.idProperty],
       });
-      // Invalidate properties query to update hasTransactions status
       queryClient.invalidateQueries({
         queryKey: ["properties"],
       });
@@ -71,15 +69,12 @@ export const useUpdatePropertyTrace = () => {
       trace: CreatePropertyTraceRequest;
     }) => propertyTraceService.updatePropertyTrace(traceId, trace),
     onSuccess: (_, variables) => {
-      // Invalidate and refetch property traces for the specific property
       queryClient.invalidateQueries({
         queryKey: ["propertyTraces", variables.trace.idProperty],
       });
-      // Also invalidate the specific trace
       queryClient.invalidateQueries({
         queryKey: ["propertyTrace", variables.traceId],
       });
-      // Invalidate properties query to update hasTransactions status
       queryClient.invalidateQueries({
         queryKey: ["properties"],
       });
@@ -100,15 +95,12 @@ export const useDeletePropertyTrace = () => {
     mutationFn: (traceId: string) =>
       propertyTraceService.deletePropertyTrace(traceId),
     onSuccess: (_, traceId) => {
-      // Invalidate all property traces queries
       queryClient.invalidateQueries({
         queryKey: ["propertyTraces"],
       });
-      // Also invalidate the specific trace
       queryClient.invalidateQueries({
         queryKey: ["propertyTrace", traceId],
       });
-      // Invalidate properties query to update hasTransactions status
       queryClient.invalidateQueries({
         queryKey: ["properties"],
       });

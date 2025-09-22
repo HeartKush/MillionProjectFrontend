@@ -1,4 +1,3 @@
-// Export all molecular components
 export { PropertyCard } from "./PropertyCard";
 export { OwnerCard } from "./OwnerCard";
 export { FilterForm } from "./FilterForm";

@@ -42,7 +42,6 @@ export const OwnerCard: React.FC<OwnerCardProps> = ({
               alt={owner.name || "Propietario"}
               className="w-24 h-24 rounded-full object-cover shadow-lg transition-transform duration-500 group-hover:scale-110"
               onError={(e) => {
-                // Si la imagen falla al cargar, la reemplazamos con el avatar de iniciales
                 const target = e.target as HTMLImageElement;
                 target.style.display = "none";
                 const parent = target.parentElement;
