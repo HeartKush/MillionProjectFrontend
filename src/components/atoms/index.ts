@@ -8,3 +8,4 @@ export { ErrorMessage } from "./ErrorMessage";
 export { Modal } from "./Modal";
 export { Toast } from "./Toast";
 export { ToastContainer } from "./ToastContainer";
+export { Switch } from "./Switch";

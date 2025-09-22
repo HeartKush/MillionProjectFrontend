@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input, Button, Select } from "@/components/atoms";
+import { Input, Button, Select, Switch } from "@/components/atoms";
 import type {
   CreatePropertyRequest,
   PropertyDetail,
@@ -26,6 +26,7 @@ const propertySchema = z.object({
     .url("Debe ser una URL válida")
     .optional()
     .or(z.literal("")),
+  featured: z.boolean().optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -57,6 +58,8 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
@@ -68,6 +71,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
       year: initialData?.year || new Date().getFullYear(),
       idOwner: initialData?.idOwner || "",
       imageUrl: initialData?.imageUrl || "",
+      featured: initialData?.featured || false,
     },
   });
 
@@ -81,6 +85,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
       idOwner: data.idOwner,
       imageUrl: data.imageUrl || undefined,
       imageEnabled: true,
+      featured: data.featured || false,
     };
     onSubmit(propertyData);
   };
@@ -215,6 +220,17 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
           {...register("imageUrl")}
           error={errors.imageUrl?.message}
           disabled={isLoading}
+        />
+      </div>
+
+      <div>
+        <Switch
+          id="featured"
+          checked={watch("featured") || false}
+          onChange={(checked) => setValue("featured", checked)}
+          disabled={isLoading}
+          label="Propiedad destacada"
+          data-testid="switch-featured"
         />
       </div>
 
