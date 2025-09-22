@@ -155,10 +155,7 @@ export const OwnerDetail: React.FC<OwnerDetailProps> = ({
 
       {/* Owner's Properties */}
       <div className="mt-8">
-        <PropertyListByOwner
-          ownerId={owner.idOwner!}
-          ownerName={owner.name}
-        />
+        <PropertyListByOwner ownerId={owner.idOwner!} ownerName={owner.name} />
       </div>
     </div>
   );

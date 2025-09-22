@@ -155,7 +155,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({
               property={property}
               onViewDetails={onPropertyClick}
               featured={index === 0 && sortBy === "newest"} // Feature the first property when sorted by newest
-              className={viewMode === "list" ? "flex flex-row" : ""}
+              layout={viewMode}
             />
           </div>
         ))}

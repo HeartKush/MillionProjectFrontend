@@ -119,7 +119,8 @@ export const PropertyListByOwner: React.FC<PropertyListByOwnerProps> = ({
             Propiedades de {ownerName || "este propietario"}
           </h3>
           <p className="text-sm text-gray-500">
-            {properties.length} {properties.length === 1 ? "propiedad" : "propiedades"} registradas
+            {properties.length}{" "}
+            {properties.length === 1 ? "propiedad" : "propiedades"} registradas
           </p>
         </div>
       </div>
@@ -201,7 +202,8 @@ export const PropertyListByOwner: React.FC<PropertyListByOwnerProps> = ({
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">
                 {formatCurrency(
-                  properties.reduce((sum, prop) => sum + prop.price, 0) / properties.length
+                  properties.reduce((sum, prop) => sum + prop.price, 0) /
+                    properties.length
                 )}
               </div>
               <div className="text-sm text-gray-500">Valor Promedio</div>
