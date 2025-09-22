@@ -8,7 +8,6 @@ interface PropertyCardProps {
   property: PropertyListItem;
   onViewDetails?: (id: string) => void;
   className?: string;
-  featured?: boolean;
   layout?: "grid" | "list";
 }
 
@@ -21,7 +20,6 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   property,
   onViewDetails,
   className,
-  featured = false,
   layout = "grid",
 }) => {
   const handleViewDetails = () => {
@@ -43,13 +41,13 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         padding="none"
         className={cn(
           "property-card group relative overflow-hidden",
-          featured && "ring-2 ring-yellow-400 shadow-glow",
+          property.featured && "ring-2 ring-yellow-400 shadow-glow",
           className
         )}
         data-testid="property-card"
       >
         {/* Featured badge */}
-        {featured && (
+        {property.featured && (
           <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 shadow-lg">
             <Star className="w-4 h-4" />
             <span>Destacada</span>
@@ -104,12 +102,20 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className="flex items-center space-x-4 text-sm text-gray-500">
               <div className="flex items-center space-x-1">
                 <Calendar className="w-4 h-4" />
-                <span>Disponible</span>
+                <span>
+                  {property.hasTransactions ? "Vendida" : "Disponible"}
+                </span>
               </div>
             </div>
 
             {/* Status indicator */}
-            <div className="status-indicator status-available">Disponible</div>
+            <div
+              className={`status-indicator ${
+                property.hasTransactions ? "status-sold" : "status-available"
+              }`}
+            >
+              {property.hasTransactions ? "Vendida" : "Disponible"}
+            </div>
           </div>
 
           {/* Action buttons */}
@@ -137,14 +143,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       padding="none"
       className={cn(
         "property-card group relative overflow-hidden",
-        featured && "ring-2 ring-yellow-400 shadow-glow",
+        property.featured && "ring-2 ring-yellow-400 shadow-glow",
         className
       )}
       data-testid="property-card"
     >
       <div className="flex">
         {/* Featured badge */}
-        {featured && (
+        {property.featured && (
           <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 shadow-lg">
             <Star className="w-4 h-4" />
             <span>Destacada</span>
@@ -201,10 +207,16 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className="flex items-center space-x-4 text-sm text-gray-500">
               <div className="flex items-center space-x-1">
                 <Calendar className="w-4 h-4" />
-                <span>Disponible</span>
+                <span>
+                  {property.hasTransactions ? "Vendida" : "Disponible"}
+                </span>
               </div>
-              <div className="status-indicator status-available">
-                Disponible
+              <div
+                className={`status-indicator ${
+                  property.hasTransactions ? "status-sold" : "status-available"
+                }`}
+              >
+                {property.hasTransactions ? "Vendida" : "Disponible"}
               </div>
             </div>
 

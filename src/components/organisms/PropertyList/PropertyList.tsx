@@ -157,7 +157,6 @@ export const PropertyList: React.FC<PropertyListProps> = ({
             <PropertyCard
               property={property}
               onViewDetails={onPropertyClick}
-              featured={index === 0 && sortBy === "newest"} // Feature the first property when sorted by newest
               layout={viewMode}
             />
           </div>

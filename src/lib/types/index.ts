@@ -7,6 +7,8 @@ export interface PropertyListItem {
   price: number;
   imageUrl?: string;
   createdAt: string;
+  hasTransactions?: boolean;
+  featured?: boolean;
 }
 
 export interface PropertyDetail {
@@ -20,6 +22,7 @@ export interface PropertyDetail {
   imageUrl?: string;
   createdAt: string;
   updatedAt?: string;
+  featured?: boolean;
 }
 
 export interface OwnerListItem {
@@ -68,6 +71,7 @@ export interface CreatePropertyRequest {
   idOwner?: string;
   imageUrl?: string;
   imageEnabled?: boolean;
+  featured?: boolean;
 }
 
 export interface CreateOwnerRequest {
