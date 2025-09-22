@@ -203,7 +203,9 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                 <Calendar className="w-4 h-4" />
                 <span>Disponible</span>
               </div>
-              <div className="status-indicator status-available">Disponible</div>
+              <div className="status-indicator status-available">
+                Disponible
+              </div>
             </div>
 
             {/* Action button */}

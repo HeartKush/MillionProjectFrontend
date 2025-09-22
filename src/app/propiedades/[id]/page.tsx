@@ -64,6 +64,9 @@ export default function PropertyDetailPage({
           setIsEditModalOpen(false);
           refetch(); // Refetch property data after successful update
         },
+        onError: (error) => {
+          console.error("Error updating property:", error);
+        },
       }
     );
   };
