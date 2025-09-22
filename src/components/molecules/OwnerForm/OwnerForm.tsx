@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,6 +37,7 @@ export const OwnerForm: React.FC<OwnerFormProps> = ({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<OwnerFormData>({
     resolver: zodResolver(ownerSchema),
@@ -47,6 +48,18 @@ export const OwnerForm: React.FC<OwnerFormProps> = ({
       birthday: initialData?.birthday ? initialData.birthday.split("T")[0] : "",
     },
   });
+
+  // Update form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        name: initialData.name || "",
+        address: initialData.address || "",
+        photo: initialData.photo || "",
+        birthday: initialData.birthday ? initialData.birthday.split("T")[0] : "",
+      });
+    }
+  }, [initialData, reset]);
 
   const handleFormSubmit = (data: OwnerFormData) => {
     const ownerData: CreateOwnerRequest = {

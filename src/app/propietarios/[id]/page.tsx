@@ -189,7 +189,7 @@ export default function OwnerDetailPage({ params }: OwnerDetailPageProps) {
         <OwnerForm
           onSubmit={handleEditSubmit}
           onCancel={() => setIsEditModalOpen(false)}
-          initialData={{ idOwner: params.id }}
+          initialData={owner}
           isLoading={updateOwnerMutation.isPending}
         />
       </Modal>

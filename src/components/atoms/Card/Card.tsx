@@ -6,11 +6,13 @@ import type { CardProps } from "@/lib/types";
  * Enhanced Card Component - Atomic Level
  * Follows Single Responsibility Principle - only handles card rendering
  */
-export const Card: React.FC<CardProps & {
-  variant?: "elevated" | "glass" | "outline";
-  hover?: boolean;
-  padding?: "none" | "sm" | "md" | "lg";
-}> = ({
+export const Card: React.FC<
+  CardProps & {
+    variant?: "elevated" | "glass" | "outline";
+    hover?: boolean;
+    padding?: "none" | "sm" | "md" | "lg";
+  }
+> = ({
   children,
   title,
   subtitle,
@@ -25,7 +27,8 @@ export const Card: React.FC<CardProps & {
   const variantClasses = {
     elevated: "card-elevated",
     glass: "card-glass",
-    outline: "border-2 border-gray-200 bg-white/50 backdrop-blur-sm rounded-2xl",
+    outline:
+      "border-2 border-gray-200 bg-white/50 backdrop-blur-sm rounded-2xl",
   };
 
   const paddingClasses = {
@@ -54,7 +57,7 @@ export const Card: React.FC<CardProps & {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="image-overlay" />
-          
+
           {/* Image overlay content */}
           {title && (
             <div className="absolute bottom-4 left-4 right-4">
@@ -82,19 +85,13 @@ export const Card: React.FC<CardProps & {
               </h3>
             )}
             {subtitle && (
-              <p className="text-gray-600 line-clamp-1">
-                {subtitle}
-              </p>
+              <p className="text-gray-600 line-clamp-1">{subtitle}</p>
             )}
           </div>
         )}
 
         {/* Main content */}
-        {children && (
-          <div className="mb-4 last:mb-0">
-            {children}
-          </div>
-        )}
+        {children && <div className="mb-4 last:mb-0">{children}</div>}
 
         {/* Actions */}
         {actions && (
