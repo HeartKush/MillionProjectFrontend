@@ -82,7 +82,7 @@ export const Card: React.FC<CardProps & {
               </h3>
             )}
             {subtitle && (
-              <p className="text-gray-600 line-clamp-2">
+              <p className="text-gray-600 line-clamp-1">
                 {subtitle}
               </p>
             )}

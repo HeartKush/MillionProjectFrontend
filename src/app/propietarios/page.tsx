@@ -178,10 +178,7 @@ export default function OwnerListPage() {
             </div>
           </div>
         ) : (
-          <OwnerList 
-            owners={owners || []} 
-            onViewOwner={handleViewOwner}
-          />
+          <OwnerList owners={owners || []} onViewOwner={handleViewOwner} />
         )}
 
         {/* Create Owner Modal */}

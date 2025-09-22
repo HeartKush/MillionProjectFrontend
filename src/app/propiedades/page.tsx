@@ -11,11 +11,7 @@ import {
   LoadingSpinner,
   ErrorMessage,
 } from "@/components/atoms";
-import {
-  useProperties,
-  useCreateProperty,
-  useOwners,
-} from "@/lib/hooks";
+import { useProperties, useCreateProperty, useOwners } from "@/lib/hooks";
 import { Plus, Home, TrendingUp, Users, DollarSign } from "lucide-react";
 import type {
   PropertyFilters as PropertyFiltersType,
@@ -84,7 +80,6 @@ export default function PropertiesPage() {
       },
     });
   };
-
 
   const handleClearFilters = () => {
     setFilters({});
