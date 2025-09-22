@@ -1,6 +1,6 @@
 import axios from "axios";
 import { httpClient } from "./client";
-import { API_ENDPOINTS } from "@/lib/constants";
+import { API_ENDPOINTS, API_BASE_URL } from "@/lib/constants";
 import type {
   PropertyTraceListItem,
   CreatePropertyTraceRequest,
@@ -69,14 +69,22 @@ export class PropertyTraceService implements IPropertyTraceService {
   async createPropertyTrace(
     trace: CreatePropertyTraceRequest
   ): Promise<{ id: string }> {
+    console.log("PropertyTraceService.createPropertyTrace called with:", trace);
+    console.log("Base endpoint:", this.baseEndpoint);
+    console.log("Full URL:", `${API_BASE_URL}${this.baseEndpoint}`);
+    
     if (!trace.idProperty) {
       throw new Error("Property ID is required");
     }
 
     try {
-      return await httpClient.post<{ id: string }>(this.baseEndpoint, trace);
+      console.log("Making POST request to create property trace...");
+      const result = await httpClient.post<{ id: string }>(this.baseEndpoint, trace);
+      console.log("Property trace created successfully:", result);
+      return result;
     } catch (error) {
       console.error("Error creating property trace:", error);
+      console.error("Error details:", error);
       throw new Error("Failed to create property trace");
     }
   }
