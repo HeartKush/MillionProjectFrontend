@@ -106,7 +106,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
     console.log("PropertyTraceForm handleFormSubmit called with data:", data);
     console.log("Form validation errors:", errors);
     console.log("PropertyId from props:", propertyId);
-    
+
     const submitData = {
       dateSale: data.dateSale,
       name: data.name || undefined,
@@ -114,7 +114,7 @@ export const PropertyTraceForm: React.FC<PropertyTraceFormProps> = ({
       tax: data.tax,
       idProperty: data.idProperty,
     };
-    
+
     console.log("PropertyTraceForm calling onSubmit with:", submitData);
     onSubmit(submitData);
   };

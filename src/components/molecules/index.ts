@@ -10,3 +10,4 @@ export { PropertyListByOwner } from "./PropertyListByOwner";
 export { OwnerDetail } from "./OwnerDetail";
 export { OwnerForm } from "./OwnerForm";
 export { PropertyForm } from "./PropertyForm";
+export { ConfirmModal } from "./ConfirmModal";

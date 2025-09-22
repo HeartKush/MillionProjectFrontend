@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/atoms";
-import { PropertyTraceList, PropertyTraceModal } from "@/components/molecules";
+import { PropertyTraceList, PropertyTraceModal, ConfirmModal } from "@/components/molecules";
 import {
   usePropertyTraces,
   useCreatePropertyTrace,
@@ -50,6 +50,8 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   const [selectedTrace, setSelectedTrace] = useState<
     PropertyTraceListItem | undefined
   >();
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [traceToDelete, setTraceToDelete] = useState<string | null>(null);
 
   // CRUD mutations
   const createTraceMutation = useCreatePropertyTrace();
@@ -91,16 +93,26 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
     }
   };
 
-  const handleDeleteTrace = async (traceId: string) => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar esta transacción?")
-    ) {
+  const handleDeleteTrace = (traceId: string) => {
+    setTraceToDelete(traceId);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (traceToDelete) {
       try {
-        await deleteTraceMutation.mutateAsync(traceId);
+        await deleteTraceMutation.mutateAsync(traceToDelete);
+        setIsConfirmModalOpen(false);
+        setTraceToDelete(null);
       } catch (error) {
         console.error("Error deleting trace:", error);
       }
     }
+  };
+
+  const handleCancelDelete = () => {
+    setIsConfirmModalOpen(false);
+    setTraceToDelete(null);
   };
 
   const isLoading =
@@ -214,6 +226,19 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
         isLoading={isLoading}
         propertyId={property.idProperty!}
         propertyValue={property.price}
+      />
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar Transacción"
+        message="¿Estás seguro de que quieres eliminar esta transacción? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={deleteTraceMutation.isPending}
       />
     </div>
   );
