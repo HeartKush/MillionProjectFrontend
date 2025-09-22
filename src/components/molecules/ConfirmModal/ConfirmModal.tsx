@@ -60,12 +60,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title=""
-      size="sm"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="" size="sm">
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center space-x-3 mb-4">

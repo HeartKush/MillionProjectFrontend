@@ -4,13 +4,18 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/atoms";
-import { PropertyTraceList, PropertyTraceModal, ConfirmModal } from "@/components/molecules";
+import {
+  PropertyTraceList,
+  PropertyTraceModal,
+  ConfirmModal,
+} from "@/components/molecules";
 import {
   usePropertyTraces,
   useCreatePropertyTrace,
   useUpdatePropertyTrace,
   useDeletePropertyTrace,
 } from "@/lib/hooks/usePropertyTraces";
+import { useToastHelpers } from "@/contexts/ToastContext";
 import { Edit, Trash2 } from "lucide-react";
 import type {
   PropertyDetail as PropertyDetailType,
@@ -39,6 +44,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   className,
 }) => {
   const router = useRouter();
+  const { showSuccess, showError } = useToastHelpers();
   const {
     data: traces,
     isLoading: tracesLoading,
@@ -83,13 +89,16 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
           traceId: selectedTrace.idPropertyTrace!,
           trace: data,
         });
+        showSuccess("Transacción actualizada correctamente");
       } else {
         // Create new trace
         await createTraceMutation.mutateAsync(data);
+        showSuccess("Transacción creada correctamente");
       }
       handleCloseModal();
     } catch (error) {
       console.error("Error saving trace:", error);
+      showError("Error al guardar la transacción");
     }
   };
 
@@ -102,10 +111,12 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
     if (traceToDelete) {
       try {
         await deleteTraceMutation.mutateAsync(traceToDelete);
+        showSuccess("Transacción eliminada correctamente");
         setIsConfirmModalOpen(false);
         setTraceToDelete(null);
       } catch (error) {
         console.error("Error deleting trace:", error);
+        showError("Error al eliminar la transacción");
       }
     }
   };
