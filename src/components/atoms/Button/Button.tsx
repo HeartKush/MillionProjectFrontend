@@ -7,11 +7,13 @@ import type { ButtonProps } from "@/lib/types";
  * Enhanced Button Component - Atomic Level
  * Follows Single Responsibility Principle - only handles button rendering and behavior
  */
-export const Button: React.FC<ButtonProps & { 
-  loading?: boolean;
-  icon?: React.ReactNode;
-  fullWidth?: boolean;
-}> = ({
+export const Button: React.FC<
+  ButtonProps & {
+    loading?: boolean;
+    icon?: React.ReactNode;
+    fullWidth?: boolean;
+  }
+> = ({
   children,
   variant = "primary",
   size = "md",
@@ -29,7 +31,7 @@ export const Button: React.FC<ButtonProps & {
 
   const variantClasses = {
     primary: "btn-primary",
-    secondary: "btn-secondary", 
+    secondary: "btn-secondary",
     success: "btn-success",
     danger: "btn-danger",
     outline: "btn-outline",
@@ -68,22 +70,15 @@ export const Button: React.FC<ButtonProps & {
       {...props}
     >
       {/* Loading spinner */}
-      {loading && (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      )}
-      
+      {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+
       {/* Icon */}
-      {!loading && icon && (
-        <span className="flex-shrink-0">
-          {icon}
-        </span>
-      )}
-      
+      {!loading && icon && <span className="flex-shrink-0">{icon}</span>}
+
       {/* Button text */}
-      <span className={cn(
-        "transition-all duration-300",
-        loading && "opacity-70"
-      )}>
+      <span
+        className={cn("transition-all duration-300", loading && "opacity-70")}
+      >
         {children}
       </span>
 
