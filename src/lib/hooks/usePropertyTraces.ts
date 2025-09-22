@@ -45,6 +45,10 @@ export const useCreatePropertyTrace = () => {
       queryClient.invalidateQueries({
         queryKey: ["propertyTraces", variables.idProperty],
       });
+      // Invalidate properties query to update hasTransactions status
+      queryClient.invalidateQueries({
+        queryKey: ["properties"],
+      });
     },
     onError: (error) => {
       console.error("Error creating property trace:", error);
@@ -75,6 +79,10 @@ export const useUpdatePropertyTrace = () => {
       queryClient.invalidateQueries({
         queryKey: ["propertyTrace", variables.traceId],
       });
+      // Invalidate properties query to update hasTransactions status
+      queryClient.invalidateQueries({
+        queryKey: ["properties"],
+      });
     },
     onError: (error) => {
       console.error("Error updating property trace:", error);
@@ -99,6 +107,10 @@ export const useDeletePropertyTrace = () => {
       // Also invalidate the specific trace
       queryClient.invalidateQueries({
         queryKey: ["propertyTrace", traceId],
+      });
+      // Invalidate properties query to update hasTransactions status
+      queryClient.invalidateQueries({
+        queryKey: ["properties"],
       });
     },
     onError: (error) => {
