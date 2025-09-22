@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { Home, Users, Menu, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { ToastContainer, useToast } from "@/components/atoms";
+import { ToastContainer } from "@/components/atoms";
+import { useToast } from "@/contexts/ToastContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -169,4 +170,3 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     </div>
   );
 };
-
