@@ -12,6 +12,7 @@ import {
   Button,
 } from "@/components/atoms";
 import { OwnerForm } from "@/components/molecules";
+import { useToastHelpers } from "@/contexts/ToastContext";
 
 interface OwnerDetailPageProps {
   params: {
@@ -26,6 +27,7 @@ interface OwnerDetailPageProps {
 export default function OwnerDetailPage({ params }: OwnerDetailPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showSuccess, showError } = useToastHelpers();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Check if we came from a property detail page
@@ -54,11 +56,21 @@ export default function OwnerDetailPage({ params }: OwnerDetailPageProps) {
     ) {
       deleteOwnerMutation.mutate(params.id, {
         onSuccess: () => {
+          showSuccess(
+            "Propietario eliminado",
+            "El propietario ha sido eliminado correctamente."
+          );
           if (fromProperty === "property" && propertyId) {
             router.push(`/propiedades/${propertyId}`);
           } else {
             router.push("/propietarios");
           }
+        },
+        onError: (error) => {
+          showError(
+            "Error al eliminar",
+            "No se pudo eliminar el propietario. Inténtalo de nuevo."
+          );
         },
       });
     }
@@ -69,8 +81,18 @@ export default function OwnerDetailPage({ params }: OwnerDetailPageProps) {
       { id: params.id, owner: data },
       {
         onSuccess: () => {
+          showSuccess(
+            "Propietario actualizado",
+            "Los cambios han sido guardados correctamente."
+          );
           setIsEditModalOpen(false);
           refetch(); // Refetch owner data after successful update
+        },
+        onError: (error) => {
+          showError(
+            "Error al actualizar",
+            "No se pudieron guardar los cambios. Inténtalo de nuevo."
+          );
         },
       }
     );

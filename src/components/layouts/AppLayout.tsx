@@ -3,18 +3,21 @@
 import React, { useState } from "react";
 import { Home, Users, Menu, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
+import { ToastContainer, useToast } from "@/components/atoms";
+import { ToastProvider } from "@/contexts/ToastContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
 
 /**
- * App Layout - Shared layout component with navigation
+ * Internal layout component that has access to toast context
  */
-export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+const AppLayoutInternal: React.FC<AppLayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { toasts, removeToast } = useToast();
 
   const tabs = [
     {
@@ -161,6 +164,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <button className="fab lg:hidden no-print">
         <Home className="w-6 h-6" />
       </button>
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
+  );
+};
+
+/**
+ * App Layout - Shared layout component with navigation and toast support
+ */
+export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  return (
+    <ToastProvider>
+      <AppLayoutInternal>{children}</AppLayoutInternal>
+    </ToastProvider>
   );
 };

@@ -15,6 +15,7 @@ import {
 import { useOwners, useCreateOwner } from "@/lib/hooks";
 import { Plus, Users, UserCheck, Calendar } from "lucide-react";
 import type { CreateOwnerRequest, OwnerFilters } from "@/lib/types";
+import { useToastHelpers } from "@/contexts/ToastContext";
 
 /**
  * Owner List Page - Complete CRUD management for owners
@@ -22,6 +23,7 @@ import type { CreateOwnerRequest, OwnerFilters } from "@/lib/types";
  */
 export default function OwnerListPage() {
   const router = useRouter();
+  const { showSuccess, showError } = useToastHelpers();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filters, setFilters] = useState<OwnerFilters>({});
 
@@ -56,8 +58,18 @@ export default function OwnerListPage() {
   const handleCreateSubmit = (data: CreateOwnerRequest) => {
     createOwnerMutation.mutate(data, {
       onSuccess: () => {
+        showSuccess(
+          "Propietario creado",
+          "El nuevo propietario ha sido creado correctamente."
+        );
         setIsCreateModalOpen(false);
         refetch();
+      },
+      onError: (error) => {
+        showError(
+          "Error al crear",
+          "No se pudo crear el propietario. Inténtalo de nuevo."
+        );
       },
     });
   };

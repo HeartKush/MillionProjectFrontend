@@ -25,6 +25,7 @@ import type {
   PropertyDetail,
 } from "@/lib/types";
 import { AppLayout } from "@/components/layouts/AppLayout";
+import { useToastHelpers } from "@/contexts/ToastContext";
 
 /**
  * Properties List Page - Complete CRUD management for properties
@@ -32,6 +33,7 @@ import { AppLayout } from "@/components/layouts/AppLayout";
  */
 export default function PropertiesPage() {
   const router = useRouter();
+  const { showSuccess, showError } = useToastHelpers();
   const [filters, setFilters] = useState<PropertyFiltersType>({});
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -94,7 +96,17 @@ export default function PropertiesPage() {
     ) {
       deletePropertyMutation.mutate(propertyId, {
         onSuccess: () => {
+          showSuccess(
+            "Propiedad eliminada",
+            "La propiedad ha sido eliminada correctamente."
+          );
           refetch();
+        },
+        onError: (error) => {
+          showError(
+            "Error al eliminar",
+            "No se pudo eliminar la propiedad. Inténtalo de nuevo."
+          );
         },
       });
     }
@@ -103,8 +115,18 @@ export default function PropertiesPage() {
   const handleCreateSubmit = (data: any) => {
     createPropertyMutation.mutate(data, {
       onSuccess: () => {
+        showSuccess(
+          "Propiedad creada",
+          "La nueva propiedad ha sido creada correctamente."
+        );
         setIsCreateModalOpen(false);
         refetch();
+      },
+      onError: (error) => {
+        showError(
+          "Error al crear",
+          "No se pudo crear la propiedad. Inténtalo de nuevo."
+        );
       },
     });
   };
@@ -115,9 +137,19 @@ export default function PropertiesPage() {
         { id: editingProperty.idProperty, property: data },
         {
           onSuccess: () => {
+            showSuccess(
+              "Propiedad actualizada",
+              "Los cambios han sido guardados correctamente."
+            );
             setIsEditModalOpen(false);
             setEditingProperty(null);
             refetch();
+          },
+          onError: (error) => {
+            showError(
+              "Error al actualizar",
+              "No se pudieron guardar los cambios. Inténtalo de nuevo."
+            );
           },
         }
       );

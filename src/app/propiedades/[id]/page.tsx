@@ -18,6 +18,7 @@ import {
   Button,
 } from "@/components/atoms";
 import { PropertyForm } from "@/components/molecules";
+import { useToastHelpers } from "@/contexts/ToastContext";
 
 interface PropertyDetailPageProps {
   params: {
@@ -33,6 +34,7 @@ export default function PropertyDetailPage({
 }: PropertyDetailPageProps) {
   const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { showSuccess, showError } = useToastHelpers();
 
   const { data: property, isLoading, error, refetch } = useProperty(params.id);
   const { data: owners, isLoading: ownersLoading } = useOwners();
@@ -50,7 +52,17 @@ export default function PropertyDetailPage({
     ) {
       deletePropertyMutation.mutate(params.id, {
         onSuccess: () => {
+          showSuccess(
+            "Propiedad eliminada",
+            "La propiedad ha sido eliminada correctamente."
+          );
           router.push("/propiedades");
+        },
+        onError: (error) => {
+          showError(
+            "Error al eliminar",
+            "No se pudo eliminar la propiedad. Inténtalo de nuevo."
+          );
         },
       });
     }
@@ -61,11 +73,18 @@ export default function PropertyDetailPage({
       { id: params.id, property: data },
       {
         onSuccess: () => {
+          showSuccess(
+            "Propiedad actualizada",
+            "Los cambios han sido guardados correctamente."
+          );
           setIsEditModalOpen(false);
           refetch(); // Refetch property data after successful update
         },
         onError: (error) => {
-          console.error("Error updating property:", error);
+          showError(
+            "Error al actualizar",
+            "No se pudieron guardar los cambios. Inténtalo de nuevo."
+          );
         },
       }
     );
