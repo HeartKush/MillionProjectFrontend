@@ -12,6 +12,12 @@ Frontend moderno para gestión de propiedades inmobiliarias desarrollado con **N
 - ✅ **State Management** - React Query para manejo de estado del servidor
 - ✅ **Formularios** - React Hook Form con validación Zod
 - ✅ **UI/UX** - Interfaz moderna y accesible
+- ✅ **Rutas Dinámicas** - Navegación con URLs persistentes
+- ✅ **CRUD Completo** - Crear, leer, actualizar y eliminar propiedades y propietarios
+- ✅ **Sistema de Transacciones** - Gestión completa de ventas con cálculo automático de impuestos
+- ✅ **Estados Dinámicos** - Disponibilidad y destacado basados en datos reales
+- ✅ **Notificaciones Toast** - Feedback visual para todas las operaciones
+- ✅ **Modales de Confirmación** - Confirmación elegante para acciones destructivas
 
 ## 🛠️ Tecnologías
 
@@ -24,6 +30,8 @@ Frontend moderno para gestión de propiedades inmobiliarias desarrollado con **N
 - **Jest** - Framework de testing
 - **React Testing Library** - Testing de componentes
 - **Axios** - Cliente HTTP
+- **date-fns** - Manipulación de fechas
+- **Lucide React** - Iconos modernos
 
 ## 📁 Estructura del Proyecto
 
@@ -33,22 +41,46 @@ src/
 │   ├── globals.css        # Estilos globales
 │   ├── layout.tsx         # Layout principal
 │   ├── page.tsx           # Página principal
-│   └── providers.tsx      # Proveedores de contexto
+│   ├── providers.tsx      # Proveedores de contexto
+│   ├── propiedades/       # Páginas de propiedades
+│   │   ├── page.tsx       # Lista de propiedades
+│   │   └── [id]/          # Detalle de propiedad
+│   └── propietarios/      # Páginas de propietarios
+│       ├── page.tsx       # Lista de propietarios
+│       └── [id]/          # Detalle de propietario
 ├── components/            # Componentes organizados por Atomic Design
 │   ├── atoms/            # Componentes atómicos
 │   │   ├── Button/
 │   │   ├── Input/
+│   │   ├── Select/
+│   │   ├── Switch/
 │   │   ├── Card/
+│   │   ├── Modal/
+│   │   ├── Toast/
 │   │   ├── LoadingSpinner/
 │   │   └── ErrorMessage/
 │   ├── molecules/        # Componentes moleculares
 │   │   ├── PropertyCard/
+│   │   ├── PropertyDetail/
+│   │   ├── PropertyForm/
+│   │   ├── PropertyTraceForm/
+│   │   ├── PropertyTraceList/
+│   │   ├── PropertyTraceModal/
+│   │   ├── PropertyListByOwner/
+│   │   ├── OwnerForm/
+│   │   ├── OwnerDetail/
 │   │   ├── FilterForm/
-│   │   └── PropertyDetail/
+│   │   ├── OwnerFilterForm/
+│   │   └── ConfirmModal/
 │   └── organisms/        # Componentes organismos
 │       ├── PropertyList/
 │       ├── PropertyFilters/
-│       └── PropertyDetailView/
+│       ├── PropertyDetailView/
+│       ├── OwnerList/
+│       ├── OwnerFilters/
+│       └── OwnerDetailView/
+├── contexts/             # Contextos de React
+│   └── ToastContext.tsx  # Contexto para notificaciones
 ├── lib/                  # Utilidades y lógica de negocio
 │   ├── api/             # Servicios de API
 │   ├── hooks/           # Hooks personalizados
@@ -188,47 +220,140 @@ El proyecto sigue la metodología **Atomic Design**:
 
 ## 🌐 API Integration
 
-### Endpoints Soportados
+### Endpoints de Propiedades
 
-- `GET /api/property` - Listar propiedades con filtros
+- `GET /api/property` - Listar propiedades con filtros avanzados
 - `GET /api/property/{id}` - Obtener propiedad por ID
 - `POST /api/property` - Crear nueva propiedad
-- `GET /api/owner` - Listar propietarios
+- `PUT /api/property/{id}` - Actualizar propiedad existente
+- `DELETE /api/property/{id}` - Eliminar propiedad
+
+### Endpoints de Propietarios
+
+- `GET /api/owner` - Listar propietarios con filtros
 - `GET /api/owner/{id}` - Obtener propietario por ID
 - `POST /api/owner` - Crear nuevo propietario
+- `PUT /api/owner/{id}` - Actualizar propietario existente
+- `DELETE /api/owner/{id}` - Eliminar propietario
 
-### Filtros de Búsqueda
+### Endpoints de Transacciones
 
-- **Nombre**: Búsqueda por nombre de propiedad
-- **Dirección**: Búsqueda por dirección
-- **Rango de Precio**: Precio mínimo y máximo
+- `GET /api/propertyTrace` - Listar transacciones por propiedad
+- `GET /api/propertyTrace/{id}` - Obtener transacción por ID
+- `POST /api/propertyTrace` - Crear nueva transacción
+- `PUT /api/propertyTrace/{id}` - Actualizar transacción existente
+- `DELETE /api/propertyTrace/{id}` - Eliminar transacción
+
+### Filtros y Parámetros
+
+#### Propiedades
+
+- **name**: Búsqueda por nombre de propiedad
+- **address**: Búsqueda por dirección
+- **minPrice/maxPrice**: Rango de precios
+- **idOwner**: Filtrar por propietario específico
+
+#### Propietarios
+
+- **name**: Búsqueda por nombre del propietario
+- **address**: Búsqueda por dirección del propietario
+
+#### Características Técnicas
+
 - **Debounce**: Búsqueda optimizada con delay de 300ms
+- **Paginación**: Soporte para paginación en listas
+- **Cache**: Invalidación automática de cache
+- **Error Handling**: Manejo robusto de errores HTTP
 
 ## 📱 Funcionalidades
 
-### Lista de Propiedades
+### 🏠 Gestión de Propiedades
 
-- ✅ Visualización en grid responsive
-- ✅ Filtros de búsqueda en tiempo real
-- ✅ Paginación y carga lazy
-- ✅ Estados de carga y error
-- ✅ Formato de moneda colombiana
+#### Lista de Propiedades
 
-### Detalle de Propiedad
+- ✅ **Vista Grid/Lista** - Alternancia entre vistas de tarjetas y lista
+- ✅ **Filtros Avanzados** - Búsqueda por nombre, dirección y rango de precios
+- ✅ **Estados Dinámicos** - Disponible/Vendida basado en transacciones
+- ✅ **Propiedades Destacadas** - Badge especial para propiedades destacadas
+- ✅ **Ordenamiento** - Por precio, fecha de creación, nombre
+- ✅ **Estadísticas** - Contadores de total, activas y recientes
+- ✅ **Responsive** - Adaptable a todos los dispositivos
 
-- ✅ Información completa de la propiedad
-- ✅ Imagen de la propiedad
-- ✅ Datos del propietario
-- ✅ Navegación de regreso
-- ✅ Estados de carga y error
+#### Detalle de Propiedad
 
-### Filtros Avanzados
+- ✅ **Información Completa** - Datos detallados de la propiedad
+- ✅ **Imagen Principal** - Visualización de imagen de alta calidad
+- ✅ **Propietario Asociado** - Información del propietario con navegación
+- ✅ **Historial de Transacciones** - Lista completa de ventas
+- ✅ **CRUD Completo** - Crear, editar y eliminar propiedades
+- ✅ **Navegación** - Rutas dinámicas con URLs persistentes
 
-- ✅ Búsqueda por nombre
-- ✅ Búsqueda por dirección
-- ✅ Rango de precios
-- ✅ Limpieza de filtros
-- ✅ Validación de formularios
+### 👥 Gestión de Propietarios
+
+#### Lista de Propietarios
+
+- ✅ **Filtros de Búsqueda** - Por nombre y dirección
+- ✅ **Estadísticas** - Contadores de total, activos y recientes
+- ✅ **Vista Responsive** - Adaptable a diferentes pantallas
+- ✅ **Navegación** - Enlaces a detalles de propietarios
+
+#### Detalle de Propietario
+
+- ✅ **Información Personal** - Datos completos del propietario
+- ✅ **Foto de Perfil** - Imagen del propietario
+- ✅ **Propiedades Asociadas** - Lista de propiedades del propietario
+- ✅ **CRUD Completo** - Crear, editar y eliminar propietarios
+- ✅ **Navegación** - Rutas dinámicas con URLs persistentes
+
+### 💰 Sistema de Transacciones
+
+#### Gestión de Transacciones
+
+- ✅ **CRUD Completo** - Crear, editar y eliminar transacciones
+- ✅ **Cálculo Automático** - Impuestos calculados según normativa colombiana
+- ✅ **Desglose de Impuestos** - Visualización detallada del cálculo
+- ✅ **Validación** - Formularios con validación robusta
+- ✅ **Historial** - Lista completa de transacciones por propiedad
+
+#### Cálculo de Impuestos
+
+- ✅ **Normativa 2025** - Tabla de impuestos actualizada
+- ✅ **UVT** - Cálculo basado en Unidades de Valor Tributario
+- ✅ **Progresivo** - Tarifas escalonadas según valor
+- ✅ **Transparente** - Desglose completo del cálculo
+
+### 🎨 Sistema de UI/UX
+
+#### Componentes Reutilizables
+
+- ✅ **Atomic Design** - Componentes organizados por niveles
+- ✅ **Switch Moderno** - Toggle elegante para valores booleanos
+- ✅ **Modales** - Confirmación y formularios en overlays
+- ✅ **Toast Notifications** - Feedback visual para todas las operaciones
+- ✅ **Loading States** - Indicadores de carga consistentes
+
+#### Navegación
+
+- ✅ **Rutas Dinámicas** - URLs persistentes y compartibles
+- ✅ **Breadcrumbs** - Navegación contextual
+- ✅ **Navbar Activo** - Indicadores de página actual
+- ✅ **Responsive** - Menú adaptativo para móviles
+
+### 🔧 Funcionalidades Técnicas
+
+#### Estado y Cache
+
+- ✅ **React Query** - Manejo inteligente de estado del servidor
+- ✅ **Invalidación Automática** - Cache sincronizado entre vistas
+- ✅ **Optimistic Updates** - Actualizaciones optimistas
+- ✅ **Error Handling** - Manejo robusto de errores
+
+#### Formularios
+
+- ✅ **React Hook Form** - Manejo eficiente de formularios
+- ✅ **Validación Zod** - Esquemas de validación robustos
+- ✅ **Debounce** - Búsquedas optimizadas
+- ✅ **Estados de Carga** - Feedback visual durante operaciones
 
 ## 🚀 Despliegue
 
