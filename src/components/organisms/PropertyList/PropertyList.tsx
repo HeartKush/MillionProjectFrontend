@@ -9,6 +9,7 @@ import type { PropertyListItem } from "@/lib/types";
 interface PropertyListProps {
   properties: PropertyListItem[];
   onPropertyClick?: (id: string) => void;
+  onDeleteProperty?: (id: string) => void;
   className?: string;
 }
 
@@ -28,6 +29,7 @@ type SortOption =
 export const PropertyList: React.FC<PropertyListProps> = ({
   properties,
   onPropertyClick,
+  onDeleteProperty,
   className,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -154,6 +156,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({
             <PropertyCard
               property={property}
               onViewDetails={onPropertyClick}
+              onDelete={onDeleteProperty}
               featured={index === 0 && sortBy === "newest"} // Feature the first property when sorted by newest
               layout={viewMode}
             />

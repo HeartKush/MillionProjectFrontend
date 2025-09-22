@@ -11,7 +11,7 @@ import {
   ErrorMessage,
   Button,
 } from "@/components/atoms";
-import { OwnerForm } from "@/components/molecules";
+import { OwnerForm, ConfirmModal } from "@/components/molecules";
 import { useToastHelpers } from "@/contexts/ToastContext";
 
 interface OwnerDetailPageProps {
@@ -29,6 +29,7 @@ export default function OwnerDetailPage({ params }: OwnerDetailPageProps) {
   const searchParams = useSearchParams();
   const { showSuccess, showError } = useToastHelpers();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Check if we came from a property detail page
   const fromProperty = searchParams?.get("from");
@@ -51,29 +52,34 @@ export default function OwnerDetailPage({ params }: OwnerDetailPageProps) {
   };
 
   const handleDelete = () => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar este propietario?")
-    ) {
-      deleteOwnerMutation.mutate(params.id, {
-        onSuccess: () => {
-          showSuccess(
-            "Propietario eliminado",
-            "El propietario ha sido eliminado correctamente."
-          );
-          if (fromProperty === "property" && propertyId) {
-            router.push(`/propiedades/${propertyId}`);
-          } else {
-            router.push("/propietarios");
-          }
-        },
-        onError: (error) => {
-          showError(
-            "Error al eliminar",
-            "No se pudo eliminar el propietario. Inténtalo de nuevo."
-          );
-        },
-      });
-    }
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteOwnerMutation.mutate(params.id, {
+      onSuccess: () => {
+        showSuccess(
+          "Propietario eliminado",
+          "El propietario ha sido eliminado correctamente."
+        );
+        setIsDeleteModalOpen(false);
+        if (fromProperty === "property" && propertyId) {
+          router.push(`/propiedades/${propertyId}`);
+        } else {
+          router.push("/propietarios");
+        }
+      },
+      onError: (error) => {
+        showError(
+          "Error al eliminar",
+          "No se pudo eliminar el propietario. Inténtalo de nuevo."
+        );
+      },
+    });
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
   };
 
   const handleEditSubmit = (data: any) => {
@@ -187,6 +193,19 @@ export default function OwnerDetailPage({ params }: OwnerDetailPageProps) {
           isLoading={updateOwnerMutation.isPending}
         />
       </Modal>
+
+      {/* Delete Owner Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar Propietario"
+        message="¿Estás seguro de que quieres eliminar este propietario? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={deleteOwnerMutation.isPending}
+      />
     </AppLayout>
   );
 }

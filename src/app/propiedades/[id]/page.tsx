@@ -17,7 +17,7 @@ import {
   ErrorMessage,
   Button,
 } from "@/components/atoms";
-import { PropertyForm } from "@/components/molecules";
+import { PropertyForm, ConfirmModal } from "@/components/molecules";
 import { useToastHelpers } from "@/contexts/ToastContext";
 
 interface PropertyDetailPageProps {
@@ -34,6 +34,7 @@ export default function PropertyDetailPage({
 }: PropertyDetailPageProps) {
   const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { showSuccess, showError } = useToastHelpers();
 
   const { data: property, isLoading, error, refetch } = useProperty(params.id);
@@ -47,25 +48,30 @@ export default function PropertyDetailPage({
   };
 
   const handleDelete = () => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar esta propiedad?")
-    ) {
-      deletePropertyMutation.mutate(params.id, {
-        onSuccess: () => {
-          showSuccess(
-            "Propiedad eliminada",
-            "La propiedad ha sido eliminada correctamente."
-          );
-          router.push("/propiedades");
-        },
-        onError: (error) => {
-          showError(
-            "Error al eliminar",
-            "No se pudo eliminar la propiedad. Inténtalo de nuevo."
-          );
-        },
-      });
-    }
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deletePropertyMutation.mutate(params.id, {
+      onSuccess: () => {
+        showSuccess(
+          "Propiedad eliminada",
+          "La propiedad ha sido eliminada correctamente."
+        );
+        setIsDeleteModalOpen(false);
+        router.push("/propiedades");
+      },
+      onError: (error) => {
+        showError(
+          "Error al eliminar",
+          "No se pudo eliminar la propiedad. Inténtalo de nuevo."
+        );
+      },
+    });
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
   };
 
   const handleEditSubmit = (data: any) => {
@@ -173,6 +179,19 @@ export default function PropertyDetailPage({
           ownersLoading={ownersLoading}
         />
       </Modal>
+
+      {/* Delete Property Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar Propiedad"
+        message="¿Estás seguro de que quieres eliminar esta propiedad? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={deletePropertyMutation.isPending}
+      />
     </AppLayout>
   );
 }
