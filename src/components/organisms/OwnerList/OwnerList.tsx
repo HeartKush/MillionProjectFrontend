@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button, Card } from "@/components/atoms";
-import { Eye } from "lucide-react";
+import { OwnerCard } from "@/components/molecules";
 import type { OwnerListItem } from "@/lib/types";
 
 interface OwnerListProps {
@@ -38,60 +37,11 @@ export const OwnerList: React.FC<OwnerListProps> = ({
     <div className={className}>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {owners.map((owner) => (
-          <Card
+          <OwnerCard
             key={owner.idOwner}
-            title={owner.name || "Sin nombre"}
-            subtitle={owner.address || "Sin dirección"}
-            actions={
-              onViewOwner && owner.idOwner ? (
-                <Button
-                  size="sm"
-                  variant="primary"
-                  onClick={() => onViewOwner(owner.idOwner!)}
-                  icon={<Eye className="w-4 h-4" />}
-                  fullWidth
-                >
-                  Ver Detalles
-                </Button>
-              ) : undefined
-            }
-            variant="elevated"
-            padding="sm"
-            className="owner-card"
-          >
-            <div className="flex justify-center mb-3">
-              {owner.photo ? (
-                <img
-                  src={owner.photo}
-                  alt={owner.name || "Propietario"}
-                  className="w-12 h-12 rounded-full object-cover"
-                  onError={(e) => {
-                    // Si la imagen falla al cargar, la reemplazamos con el avatar de iniciales
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                    const parent = target.parentElement;
-                    if (parent) {
-                      const fallbackAvatar = parent.querySelector(
-                        ".fallback-avatar"
-                      ) as HTMLElement;
-                      if (fallbackAvatar) {
-                        fallbackAvatar.style.display = "flex";
-                      }
-                    }
-                  }}
-                />
-              ) : null}
-              <div
-                className={`w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center ${
-                  owner.photo ? "fallback-avatar hidden" : ""
-                }`}
-              >
-                <span className="text-white font-bold text-lg">
-                  {owner.name?.charAt(0) || "?"}
-                </span>
-              </div>
-            </div>
-          </Card>
+            owner={owner}
+            onViewOwner={onViewOwner}
+          />
         ))}
       </div>
     </div>
