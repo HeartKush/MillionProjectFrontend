@@ -21,6 +21,8 @@ Frontend moderno para gestión de propiedades inmobiliarias desarrollado con **N
 - ✅ **Código Limpio** - Sin archivos basura, comentarios redundantes o console.log de debugging
 - ✅ **TypeScript Estricto** - 0 errores de TypeScript y linting
 - ✅ **Tests Estables** - Todos los tests pasando con alta cobertura
+- ✅ **Tailwind CSS** - Configuración optimizada con PostCSS
+- ✅ **Build Optimizado** - Compilación de producción sin errores
 
 ## 🛠️ Tecnologías
 
@@ -126,6 +128,7 @@ src/
 
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:5120
+   NODE_ENV=development
    ```
 
 4. **Ejecutar en desarrollo**
@@ -380,8 +383,33 @@ NODE_ENV=production
 ### Build de Producción
 
 ```bash
+# Verificar que no hay errores de TypeScript
+npm run type-check
+
+# Ejecutar tests antes del build
+npm run test
+
+# Construir para producción
 npm run build
+
+# Ejecutar servidor de producción
 npm run start
+```
+
+### Verificación de Build
+
+```bash
+# Verificar tipos TypeScript
+npm run type-check
+
+# Ejecutar linting
+npm run lint
+
+# Ejecutar tests con cobertura
+npm run test:coverage
+
+# Build de producción
+npm run build
 ```
 
 ### Docker (Opcional)
@@ -389,12 +417,63 @@ npm run start
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
+
+# Copiar archivos de dependencias
 COPY package*.json ./
+COPY postcss.config.js ./
+COPY tailwind.config.js ./
+
+# Instalar dependencias
 RUN npm ci --only=production
+
+# Copiar código fuente
 COPY . .
+
+# Construir aplicación
 RUN npm run build
+
+# Exponer puerto
 EXPOSE 3000
+
+# Comando de inicio
 CMD ["npm", "start"]
+```
+
+### Docker Compose
+
+```yaml
+version: "3.8"
+
+services:
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:5120
+      - NODE_ENV=production
+    depends_on:
+      - backend
+
+  backend:
+    image: million-project-api
+    ports:
+      - "5120:8080"
+    environment:
+      - MONGO_CONNECTION_STRING=mongodb://mongo:27017
+      - DATABASE_NAME=PropertiesBD
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
 ```
 
 ## 🤝 Contribución
@@ -415,9 +494,53 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ---
 
+## 🔧 Configuración Técnica
+
+### Tailwind CSS
+
+El proyecto utiliza Tailwind CSS con configuración optimizada:
+
+- **PostCSS**: Configuración en `postcss.config.js`
+- **Tailwind Config**: Configuración personalizada en `tailwind.config.js`
+- **Purge CSS**: Optimización automática de estilos no utilizados
+- **Custom Classes**: Clases personalizadas para componentes específicos
+
+### Estructura de Estilos
+
+```
+src/
+├── app/
+│   └── globals.css          # Estilos globales y Tailwind directives
+├── components/
+│   └── **/                  # Estilos específicos por componente
+└── styles/                  # Estilos adicionales
+```
+
+### Scripts de Desarrollo
+
+```bash
+# Desarrollo con hot reload
+npm run dev
+
+# Build de producción
+npm run build
+
+# Verificación de tipos
+npm run type-check
+
+# Linting
+npm run lint
+
+# Tests
+npm run test
+npm run test:watch
+npm run test:coverage
+```
+
 ## 📚 Documentación Adicional
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [React Query Documentation](https://tanstack.com/query/latest)
 - [Atomic Design Methodology](https://bradfrost.com/blog/post/atomic-web-design/)
+- [PostCSS Documentation](https://postcss.org/)
