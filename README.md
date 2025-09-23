@@ -167,7 +167,6 @@ El proyecto incluye una suite completa de tests unitarios:
 - **Cobertura mínima**: 80% en branches, functions, lines y statements
 - **Frameworks**: Jest + React Testing Library
 - **Estrategia**: Testing de componentes, hooks y utilidades
-- **Cobertura mejorada**: FilterForm (66.66%), OwnerFilterForm (75%), PropertyForm (85.71%)
 
 ### Estadísticas de Testing
 
