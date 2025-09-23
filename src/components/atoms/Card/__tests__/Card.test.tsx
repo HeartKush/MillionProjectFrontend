@@ -82,9 +82,7 @@ describe("Card Component", () => {
     );
 
     // Find the outermost card div (the one with custom className)
-    const card = screen
-      .getByText("Card Content")
-      .closest(".bg-white.rounded-lg.shadow-md");
+    const card = screen.getByText("Card Content").closest(".card-elevated");
     expect(card).toHaveClass("custom-class");
   });
 
@@ -96,17 +94,8 @@ describe("Card Component", () => {
     );
 
     // Find the outermost card div (the one with default classes)
-    const card = screen
-      .getByText("Card Content")
-      .closest(".bg-white.rounded-lg.shadow-md");
-    expect(card).toHaveClass(
-      "bg-white",
-      "rounded-lg",
-      "shadow-md",
-      "overflow-hidden",
-      "border",
-      "border-gray-200"
-    );
+    const card = screen.getByText("Card Content").closest(".card-elevated");
+    expect(card).toHaveClass("card-elevated", "overflow-hidden");
   });
 
   it("renders without optional props", () => {

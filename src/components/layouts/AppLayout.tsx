@@ -47,7 +47,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   };
 
   const isActive = (paths: string[]) => {
-    return paths.includes(pathname);
+    return pathname ? paths.includes(pathname) : false;
   };
 
   return (

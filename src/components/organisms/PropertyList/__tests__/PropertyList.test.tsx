@@ -1,280 +1,253 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { PropertyList } from "../PropertyList";
+import { Grid, List } from "lucide-react";
 
-// Mock the dependencies
-jest.mock("@/components/atoms", () => ({
-  LoadingSpinner: ({ size }: any) => (
-    <div data-testid="loading-spinner">Loading...</div>
-  ),
-  ErrorMessage: ({ message, variant }: any) => (
-    <div data-testid="error-message">{message}</div>
-  ),
-}));
-
+// Mock the PropertyCard component
 jest.mock("@/components/molecules", () => ({
-  PropertyCard: ({ property, onViewDetails, onEdit, onDelete }: any) => (
+  PropertyCard: ({ property, onViewDetails, layout }: any) => (
     <div data-testid={`property-card-${property.idProperty}`}>
       <h3>{property.name}</h3>
       <p>{property.address}</p>
+      <p>${property.price.toLocaleString()}</p>
       <button onClick={() => onViewDetails?.(property.idProperty)}>
         Ver Detalles
       </button>
-      <button onClick={() => onEdit?.(property)}>Editar</button>
-      <button onClick={() => onDelete?.(property.idProperty)}>Eliminar</button>
     </div>
   ),
 }));
 
-jest.mock("@/lib/hooks", () => ({
-  useProperties: jest.fn(),
+// Mock lucide-react icons
+jest.mock("lucide-react", () => ({
+  Grid: () => <span data-testid="grid-icon">GridIcon</span>,
+  List: () => <span data-testid="list-icon">ListIcon</span>,
 }));
-
-// Import the real component
-import { PropertyList } from "../PropertyList";
-import { useProperties } from "@/lib/hooks";
 
 const mockProperties = [
   {
     idProperty: "prop-1",
     name: "Test Property 1",
-    address: "123 Test St",
-    price: 100000,
-    imageUrl: "https://example.com/image1.jpg",
+    address: "123 Test Street",
+    price: 1000000,
+    createdAt: "2023-01-01T00:00:00Z",
   },
   {
     idProperty: "prop-2",
     name: "Test Property 2",
-    address: "456 Test Ave",
-    price: 200000,
-    imageUrl: "https://example.com/image2.jpg",
+    address: "456 Test Avenue",
+    price: 2000000,
+    createdAt: "2023-01-02T00:00:00Z",
   },
 ];
 
 describe("PropertyList Component", () => {
-  const mockOnPropertyClick = jest.fn();
-  const mockOnEditProperty = jest.fn();
-  const mockOnDeleteProperty = jest.fn();
-  const mockUseProperties = useProperties as jest.MockedFunction<
-    typeof useProperties
-  >;
+  it("renders properties correctly", () => {
+    render(<PropertyList properties={mockProperties} />);
 
-  const createMockQueryResult = (overrides: any = {}) => ({
-    data: mockProperties,
-    isLoading: false,
-    error: null,
-    refetch: jest.fn(),
-    isError: false,
-    isPending: false,
-    isLoadingError: false,
-    isRefetchError: false,
-    isSuccess: true,
-    isFetching: false,
-    isRefetching: false,
-    isStale: false,
-    isFetched: true,
-    isFetchedAfterMount: true,
-    isPlaceholderData: false,
-    isPreviousData: false,
-    status: "success" as const,
-    fetchStatus: "idle" as const,
-    dataUpdatedAt: Date.now(),
-    errorUpdatedAt: 0,
-    failureCount: 0,
-    failureReason: null,
-    errorUpdateCount: 0,
-    isFetchingNextPage: false,
-    isFetchingPreviousPage: false,
-    hasNextPage: false,
-    hasPreviousPage: false,
-    fetchNextPage: jest.fn(),
-    fetchPreviousPage: jest.fn(),
-    remove: jest.fn(),
-    ...overrides,
-  });
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockUseProperties.mockReturnValue(createMockQueryResult());
-  });
-
-  it("renders property list", () => {
-    render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-      />
-    );
-
-    expect(screen.getByText("🏠 Propiedades")).toBeInTheDocument();
+    expect(screen.getByText("Propiedades Disponibles")).toBeInTheDocument();
     expect(screen.getByText("Test Property 1")).toBeInTheDocument();
     expect(screen.getByText("Test Property 2")).toBeInTheDocument();
   });
 
+  it("displays correct property count", () => {
+    render(<PropertyList properties={mockProperties} />);
+    expect(screen.getByText("2 propiedades encontradas")).toBeInTheDocument();
+  });
+
+  it("displays singular form for single property", () => {
+    render(<PropertyList properties={[mockProperties[0]]} />);
+    expect(screen.getByText("1 propiedad encontrada")).toBeInTheDocument();
+  });
+
   it("handles property click", () => {
+    const mockOnPropertyClick = jest.fn();
     render(
       <PropertyList
-        filters={{}}
+        properties={mockProperties}
         onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
       />
     );
 
     const clickButton = screen.getAllByText("Ver Detalles")[0];
     fireEvent.click(clickButton);
 
-    expect(mockOnPropertyClick).toHaveBeenCalledWith("prop-1");
-  });
-
-  it("handles edit property", () => {
-    render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-      />
-    );
-
-    const editButton = screen.getAllByText("Editar")[0];
-    fireEvent.click(editButton);
-
-    expect(mockOnEditProperty).toHaveBeenCalledWith(mockProperties[0]);
-  });
-
-  it("handles delete property", () => {
-    render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-      />
-    );
-
-    const deleteButton = screen.getAllByText("Eliminar")[0];
-    fireEvent.click(deleteButton);
-
-    expect(mockOnDeleteProperty).toHaveBeenCalledWith("prop-1");
+    expect(mockOnPropertyClick).toHaveBeenCalledWith("prop-2");
   });
 
   it("applies custom className", () => {
     render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-        className="custom-class"
-      />
+      <PropertyList properties={mockProperties} className="custom-class" />
     );
-
-    const list = screen.getByText("🏠 Propiedades").closest("div")
-      ?.parentElement?.parentElement;
+    const list = screen.getByText("Propiedades Disponibles").closest("div")
+      ?.parentElement?.parentElement?.parentElement?.parentElement;
     expect(list).toHaveClass("custom-class");
   });
 
-  it("handles empty properties array", () => {
-    mockUseProperties.mockReturnValue(createMockQueryResult({ data: [] }));
-
-    render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-      />
-    );
+  it("renders empty state when no properties", () => {
+    render(<PropertyList properties={[]} />);
 
     expect(
       screen.getByText("No se encontraron propiedades")
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "No hay propiedades que coincidan con los filtros aplicados."
+      )
+    ).toBeInTheDocument();
   });
 
-  it("handles loading state", () => {
-    mockUseProperties.mockReturnValue(
-      createMockQueryResult({
-        data: null,
-        isLoading: true,
-        isSuccess: false,
-        status: "pending" as const,
-      })
-    );
+  it("renders view mode toggle buttons", () => {
+    render(<PropertyList properties={mockProperties} />);
 
-    render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-      />
-    );
-
-    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
+    expect(screen.getByTestId("grid-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("list-icon")).toBeInTheDocument();
   });
 
-  it("handles error state", () => {
-    const mockRefetch = jest.fn();
-    mockUseProperties.mockReturnValue(
-      createMockQueryResult({
-        data: null,
-        isLoading: false,
-        error: new Error("Test error"),
-        refetch: mockRefetch,
-        isError: true,
-        isSuccess: false,
-        status: "error" as const,
-      })
-    );
+  it("switches between grid and list view", () => {
+    render(<PropertyList properties={mockProperties} />);
 
-    render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-      />
-    );
+    const listButton = screen.getByTestId("list-icon").closest("button");
+    const gridButton = screen.getByTestId("grid-icon").closest("button");
 
-    expect(screen.getByTestId("error-message")).toBeInTheDocument();
-    expect(screen.getByText("Reintentar")).toBeInTheDocument();
+    // Default should be grid
+    expect(gridButton).toHaveClass("bg-white", "shadow-sm", "text-blue-600");
+    expect(listButton).toHaveClass("text-gray-500");
 
-    // Click the retry button to cover line 51
-    const retryButton = screen.getByText("Reintentar");
-    fireEvent.click(retryButton);
+    // Click list button
+    fireEvent.click(listButton!);
+    expect(listButton).toHaveClass("bg-white", "shadow-sm", "text-blue-600");
+    expect(gridButton).toHaveClass("text-gray-500");
 
-    // Verify that refetch was called
-    expect(mockRefetch).toHaveBeenCalledTimes(1);
+    // Click grid button
+    fireEvent.click(gridButton!);
+    expect(gridButton).toHaveClass("bg-white", "shadow-sm", "text-blue-600");
+    expect(listButton).toHaveClass("text-gray-500");
   });
 
-  it("renders single property count correctly (line 81)", () => {
-    // Test with exactly 1 property to cover the singular case
-    const singleProperty = [mockProperties[0]];
+  it("renders sort dropdown", () => {
+    render(<PropertyList properties={mockProperties} />);
 
-    mockUseProperties.mockReturnValue(
-      createMockQueryResult({
-        data: singleProperty,
-        isLoading: false,
-        error: null,
-        refetch: jest.fn(),
-        isError: false,
-        isSuccess: true,
-        status: "success" as const,
-      })
+    const sortSelect = screen.getByDisplayValue("Más recientes");
+    expect(sortSelect).toBeInTheDocument();
+    expect(sortSelect).toHaveClass("form-input");
+  });
+
+  it("sorts properties by price ascending", () => {
+    render(<PropertyList properties={mockProperties} />);
+
+    const sortSelect = screen.getByDisplayValue("Más recientes");
+    fireEvent.change(sortSelect, { target: { value: "price-asc" } });
+
+    // Check that properties are sorted by price (ascending)
+    const propertyCards = screen.getAllByTestId(/property-card-/);
+    expect(propertyCards[0]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-1"
     );
-
-    render(
-      <PropertyList
-        filters={{}}
-        onPropertyClick={mockOnPropertyClick}
-        onEditProperty={mockOnEditProperty}
-        onDeleteProperty={mockOnDeleteProperty}
-      />
+    expect(propertyCards[1]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-2"
     );
+  });
 
-    // Verify that the singular form "propiedad encontrada" is displayed
-    expect(screen.getByText("✨ 1 propiedad encontrada")).toBeInTheDocument();
+  it("sorts properties by price descending", () => {
+    render(<PropertyList properties={mockProperties} />);
+
+    const sortSelect = screen.getByDisplayValue("Más recientes");
+    fireEvent.change(sortSelect, { target: { value: "price-desc" } });
+
+    // Check that properties are sorted by price (descending)
+    const propertyCards = screen.getAllByTestId(/property-card-/);
+    expect(propertyCards[0]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-2"
+    );
+    expect(propertyCards[1]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-1"
+    );
+  });
+
+  it("sorts properties by name ascending", () => {
+    render(<PropertyList properties={mockProperties} />);
+
+    const sortSelect = screen.getByDisplayValue("Más recientes");
+    fireEvent.change(sortSelect, { target: { value: "name-asc" } });
+
+    // Check that properties are sorted by name (ascending)
+    const propertyCards = screen.getAllByTestId(/property-card-/);
+    expect(propertyCards[0]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-1"
+    );
+    expect(propertyCards[1]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-2"
+    );
+  });
+
+  it("sorts properties by name descending", () => {
+    render(<PropertyList properties={mockProperties} />);
+
+    const sortSelect = screen.getByDisplayValue("Más recientes");
+    fireEvent.change(sortSelect, { target: { value: "name-desc" } });
+
+    // Check that properties are sorted by name (descending)
+    const propertyCards = screen.getAllByTestId(/property-card-/);
+    expect(propertyCards[0]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-2"
+    );
+    expect(propertyCards[1]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-1"
+    );
+  });
+
+  it("sorts properties by newest by default", () => {
+    render(<PropertyList properties={mockProperties} />);
+
+    // Check that properties are sorted by newest (prop-2 should come first)
+    const propertyCards = screen.getAllByTestId(/property-card-/);
+    expect(propertyCards[0]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-2"
+    );
+    expect(propertyCards[1]).toHaveAttribute(
+      "data-testid",
+      "property-card-prop-1"
+    );
+  });
+
+  it("handles properties with missing names gracefully", () => {
+    const propertiesWithMissingNames = [
+      { ...mockProperties[0], name: undefined },
+      { ...mockProperties[1], name: "" },
+    ];
+
+    render(<PropertyList properties={propertiesWithMissingNames} />);
+
+    // Should not crash and should still render
+    expect(screen.getByText("Propiedades Disponibles")).toBeInTheDocument();
+  });
+
+  it("applies correct CSS classes for grid view", () => {
+    render(<PropertyList properties={mockProperties} />);
+
+    // Check that the grid view is applied by looking for the class in the DOM
+    const gridContainer = document.querySelector(".property-grid");
+    expect(gridContainer).toBeInTheDocument();
+  });
+
+  it("applies correct CSS classes for list view", () => {
+    render(<PropertyList properties={mockProperties} />);
+
+    // Switch to list view
+    const listButton = screen.getByTestId("list-icon").closest("button");
+    fireEvent.click(listButton!);
+
+    // Check that the list view is applied by looking for the class in the DOM
+    const listContainer = document.querySelector(".space-y-4");
+    expect(listContainer).toBeInTheDocument();
   });
 });

@@ -50,7 +50,7 @@ const createWrapper = () => {
     defaultOptions: {
       queries: {
         retry: false,
-        cacheTime: 0,
+        gcTime: 0,
       },
       mutations: {
         retry: false,
@@ -354,7 +354,12 @@ describe("useCreateProperty", () => {
   it("calls propertyService.createProperty on mutation", async () => {
     const { result } = renderHook(() => useCreateProperty(), { wrapper });
 
-    const propertyData = { name: "Test Property", address: "123 Test St" };
+    const propertyData = {
+      name: "Test Property",
+      address: "123 Test St",
+      price: 100000,
+      year: 2024,
+    };
 
     await act(async () => {
       result.current.mutate(propertyData);
@@ -368,7 +373,12 @@ describe("useCreateProperty", () => {
 
     const { result } = renderHook(() => useCreateProperty(), { wrapper });
 
-    const propertyData = { name: "Test Property", address: "123 Test St" };
+    const propertyData = {
+      name: "Test Property",
+      address: "123 Test St",
+      price: 100000,
+      year: 2024,
+    };
 
     await act(async () => {
       result.current.mutate(propertyData);
@@ -385,7 +395,12 @@ describe("useCreateProperty", () => {
 
     const { result } = renderHook(() => useCreateProperty(), { wrapper });
 
-    const propertyData = { name: "Test Property", address: "123 Test St" };
+    const propertyData = {
+      name: "Test Property",
+      address: "123 Test St",
+      price: 100000,
+      year: 2024,
+    };
 
     await act(async () => {
       result.current.mutate(propertyData);
@@ -429,7 +444,12 @@ describe("useUpdateProperty", () => {
 
     const updateData = {
       id: "123",
-      property: { name: "Updated Property", address: "456 Updated St" },
+      property: {
+        name: "Updated Property",
+        address: "456 Updated St",
+        price: 100000,
+        year: 2024,
+      },
     };
 
     await act(async () => {
@@ -449,7 +469,12 @@ describe("useUpdateProperty", () => {
 
     const updateData = {
       id: "123",
-      property: { name: "Updated Property", address: "456 Updated St" },
+      property: {
+        name: "Updated Property",
+        address: "456 Updated St",
+        price: 100000,
+        year: 2024,
+      },
     };
 
     await act(async () => {
@@ -469,7 +494,12 @@ describe("useUpdateProperty", () => {
 
     const updateData = {
       id: "123",
-      property: { name: "Updated Property", address: "456 Updated St" },
+      property: {
+        name: "Updated Property",
+        address: "456 Updated St",
+        price: 100000,
+        year: 2024,
+      },
     };
 
     await act(async () => {

@@ -127,57 +127,59 @@ export const PropertyListByOwner: React.FC<PropertyListByOwnerProps> = ({
 
       <div className="space-y-4">
         {properties.map((property) => (
-          <Card
+          <div
             key={property.idProperty}
-            className="p-4 hover:shadow-lg transition-all duration-200 cursor-pointer group"
+            className="cursor-pointer group"
             onClick={() => handleViewProperty(property.idProperty!)}
           >
-            <div className="flex items-center space-x-4">
-              {/* Property Image */}
-              <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                <img
-                  src={
-                    property.imageUrl ||
-                    "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  }
-                  alt={property.name || "Propiedad"}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            <Card className="p-4 hover:shadow-lg transition-all duration-200">
+              <div className="flex items-center space-x-4">
+                {/* Property Image */}
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                  <img
+                    src={
+                      property.imageUrl ||
+                      "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    }
+                    alt={property.name || "Propiedad"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
-              {/* Property Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                      {property.name || "Sin nombre"}
-                    </h4>
-                    <div className="flex items-center text-sm text-gray-500 mt-1">
-                      <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
-                      <span className="truncate">
-                        {property.address || "Sin dirección"}
-                      </span>
+                {/* Property Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                        {property.name || "Sin nombre"}
+                      </h4>
+                      <div className="flex items-center text-sm text-gray-500 mt-1">
+                        <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">
+                          {property.address || "Sin dirección"}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right ml-4">
-                    <div className="text-lg font-bold text-gray-900">
-                      {formatCurrency(property.price)}
+                    <div className="text-right ml-4">
+                      <div className="text-lg font-bold text-gray-900">
+                        {formatCurrency(property.price)}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewProperty(property.idProperty!);
+                        }}
+                        className="mt-1 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        Ver detalles
+                      </button>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewProperty(property.idProperty!);
-                      }}
-                      className="mt-1 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
-                    >
-                      <Eye className="w-3 h-3 mr-1" />
-                      Ver detalles
-                    </button>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         ))}
       </div>
 

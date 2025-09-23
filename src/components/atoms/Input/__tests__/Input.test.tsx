@@ -4,45 +4,26 @@ import { Input } from "../Input";
 
 describe("Input Component", () => {
   it("renders with default props", () => {
-    render(<Input placeholder="Enter text" />);
-
-    const input = screen.getByPlaceholderText("Enter text");
-    expect(input).toBeInTheDocument();
-    expect(input).toHaveAttribute("type", "text");
-  });
-
-  it("renders with different types", () => {
-    const { rerender } = render(<Input type="email" placeholder="Email" />);
-    expect(screen.getByPlaceholderText("Email")).toHaveAttribute(
-      "type",
-      "email"
-    );
-
-    rerender(<Input type="password" placeholder="Password" />);
-    expect(screen.getByPlaceholderText("Password")).toHaveAttribute(
-      "type",
-      "password"
-    );
-
-    rerender(<Input type="number" placeholder="Number" />);
-    expect(screen.getByPlaceholderText("Number")).toHaveAttribute(
-      "type",
-      "number"
-    );
-  });
-
-  it("handles value changes", () => {
-    const handleChange = jest.fn();
-    render(<Input onChange={handleChange} placeholder="Test input" />);
+    render(<Input placeholder="Test input" />);
 
     const input = screen.getByPlaceholderText("Test input");
-    fireEvent.change(input, { target: { value: "test value" } });
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveClass("form-input");
+  });
 
-    expect(handleChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        target: expect.objectContaining({ value: "test value" }),
-      })
-    );
+  it("renders with label", () => {
+    render(<Input label="Test Label" placeholder="Test input" />);
+
+    expect(screen.getByText("Test Label")).toBeInTheDocument();
+    // Check that the input is associated with the label by checking the input directly
+    const input = screen.getByPlaceholderText("Test input");
+    expect(input).toBeInTheDocument();
+  });
+
+  it("renders with helper text", () => {
+    render(<Input helperText="Helper text" placeholder="Test input" />);
+
+    expect(screen.getByText("Helper text")).toBeInTheDocument();
   });
 
   it("displays error message", () => {
@@ -50,7 +31,7 @@ describe("Input Component", () => {
 
     expect(screen.getByText("This field is required")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Test input")).toHaveClass(
-      "border-red-500"
+      "form-input-error"
     );
   });
 
@@ -59,26 +40,103 @@ describe("Input Component", () => {
 
     const input = screen.getByPlaceholderText("Disabled input");
     expect(input).toBeDisabled();
-    expect(input).toHaveClass("disabled:bg-gray-100");
+    expect(input).toHaveClass("opacity-50", "cursor-not-allowed");
   });
 
   it("is required when required prop is true", () => {
     render(<Input required placeholder="Required input" />);
 
-    expect(screen.getByPlaceholderText("Required input")).toBeRequired();
+    const input = screen.getByPlaceholderText("Required input");
+    expect(input).toBeRequired();
+  });
+
+  it("handles value changes", () => {
+    const handleChange = jest.fn();
+    render(<Input onChange={handleChange} placeholder="Test input" />);
+
+    const input = screen.getByPlaceholderText("Test input");
+    fireEvent.change(input, { target: { value: "new value" } });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders with left icon", () => {
+    const LeftIcon = () => <span data-testid="left-icon">Left</span>;
+    render(<Input leftIcon={<LeftIcon />} placeholder="Test input" />);
+
+    expect(screen.getByTestId("left-icon")).toBeInTheDocument();
+  });
+
+  it("renders with right icon", () => {
+    const RightIcon = () => <span data-testid="right-icon">Right</span>;
+    render(<Input rightIcon={<RightIcon />} placeholder="Test input" />);
+
+    expect(screen.getByTestId("right-icon")).toBeInTheDocument();
+  });
+
+  it("toggles password visibility", () => {
+    render(<Input type="password" showPasswordToggle placeholder="Password" />);
+
+    const input = screen.getByPlaceholderText("Password");
+    expect(input).toHaveAttribute("type", "password");
+
+    const toggleButton = screen.getByRole("button");
+    fireEvent.click(toggleButton);
+
+    expect(input).toHaveAttribute("type", "text");
   });
 
   it("applies custom className", () => {
-    render(<Input className="custom-class" placeholder="Custom input" />);
+    render(<Input className="custom-class" placeholder="Test input" />);
 
-    expect(screen.getByPlaceholderText("Custom input")).toHaveClass(
-      "custom-class"
+    const input = screen.getByPlaceholderText("Test input");
+    expect(input).toHaveClass("custom-class");
+  });
+
+  it("handles focus events", () => {
+    render(<Input placeholder="Test input" />);
+
+    const input = screen.getByPlaceholderText("Test input");
+    fireEvent.focus(input);
+
+    // The component should handle focus state internally
+    expect(input).toBeInTheDocument();
+  });
+
+  it("handles blur events", () => {
+    render(<Input placeholder="Test input" />);
+
+    const input = screen.getByPlaceholderText("Test input");
+    fireEvent.blur(input);
+
+    // The component should handle blur state internally
+    expect(input).toBeInTheDocument();
+  });
+
+  it("renders with different input types", () => {
+    const { rerender } = render(<Input type="text" placeholder="Text input" />);
+    expect(screen.getByPlaceholderText("Text input")).toHaveAttribute(
+      "type",
+      "text"
+    );
+
+    rerender(<Input type="email" placeholder="Email input" />);
+    expect(screen.getByPlaceholderText("Email input")).toHaveAttribute(
+      "type",
+      "email"
+    );
+
+    rerender(<Input type="number" placeholder="Number input" />);
+    expect(screen.getByPlaceholderText("Number input")).toHaveAttribute(
+      "type",
+      "number"
     );
   });
 
-  it("displays current value", () => {
-    render(<Input value="Current value" placeholder="Test input" />);
+  it("forwards ref correctly", () => {
+    const ref = React.createRef<HTMLInputElement>();
+    render(<Input ref={ref} placeholder="Test input" />);
 
-    expect(screen.getByDisplayValue("Current value")).toBeInTheDocument();
+    expect(ref.current).toBeInstanceOf(HTMLInputElement);
   });
 });

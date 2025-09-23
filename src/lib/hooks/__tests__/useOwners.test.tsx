@@ -49,6 +49,7 @@ const mockOwners: OwnerListItem[] = [
     address: "123 Main St",
     photo: "photo1.jpg",
     birthday: "1990-01-01T00:00:00.000Z",
+    createdAt: "2024-01-01T00:00:00Z",
   },
   {
     idOwner: "2",
@@ -56,6 +57,7 @@ const mockOwners: OwnerListItem[] = [
     address: "456 Oak Ave",
     photo: "photo2.jpg",
     birthday: "1985-05-15T00:00:00.000Z",
+    createdAt: "2024-01-01T00:00:00Z",
   },
 ];
 
@@ -65,7 +67,7 @@ const mockOwnerDetail: OwnerDetail = {
   address: "123 Main St",
   photo: "photo1.jpg",
   birthday: "1990-01-01T00:00:00.000Z",
-  properties: [],
+  createdAt: "2024-01-01T00:00:00Z",
 };
 
 describe("useOwners hooks", () => {
@@ -97,13 +99,16 @@ describe("useOwners hooks", () => {
 
       expect(result.current.data).toEqual(mockOwners);
       expect(result.current.error).toBeNull();
-      expect(mockOwnerService.searchOwners).toHaveBeenCalledWith(undefined);
+      expect(mockOwnerService.searchOwners).toHaveBeenCalledWith(
+        undefined,
+        undefined
+      );
     });
 
     it("should fetch owners with name filter", async () => {
       mockOwnerService.searchOwners.mockResolvedValue([mockOwners[0]]);
 
-      const { result } = renderHook(() => useOwners("John"), {
+      const { result } = renderHook(() => useOwners({ name: "John" }), {
         wrapper: createWrapper(),
       });
 
@@ -112,7 +117,10 @@ describe("useOwners hooks", () => {
       });
 
       expect(result.current.data).toEqual([mockOwners[0]]);
-      expect(mockOwnerService.searchOwners).toHaveBeenCalledWith("John");
+      expect(mockOwnerService.searchOwners).toHaveBeenCalledWith(
+        "John",
+        undefined
+      );
     });
 
     it("should handle fetch error", async () => {

@@ -67,8 +67,18 @@ describe("useProperties Hook", () => {
 
   it("fetches properties successfully", async () => {
     const mockProperties = [
-      { idProperty: "1", name: "Property 1", price: 100000 },
-      { idProperty: "2", name: "Property 2", price: 200000 },
+      {
+        idProperty: "1",
+        name: "Property 1",
+        price: 100000,
+        createdAt: "2024-01-01T00:00:00Z",
+      },
+      {
+        idProperty: "2",
+        name: "Property 2",
+        price: 200000,
+        createdAt: "2024-01-01T00:00:00Z",
+      },
     ];
     mockPropertyService.searchProperties.mockResolvedValue(mockProperties);
 
@@ -136,6 +146,7 @@ describe("useProperty Hook", () => {
       name: "Test Property",
       price: 100000,
       year: 2023,
+      createdAt: "2024-01-01T00:00:00Z",
     };
     mockPropertyService.getPropertyById.mockResolvedValue(mockProperty);
 

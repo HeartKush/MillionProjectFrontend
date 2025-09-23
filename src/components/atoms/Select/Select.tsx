@@ -83,10 +83,18 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
           {/* Right side icons */}
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 pointer-events-none">
-            {error && <AlertCircle className="w-5 h-5 text-red-500" />}
+            {error && (
+              <AlertCircle
+                className="w-5 h-5 text-red-500"
+                data-testid="alert-circle"
+              />
+            )}
 
             {/* Chevron down icon */}
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown
+              className="w-5 h-5 text-gray-400"
+              data-testid="chevron-down"
+            />
           </div>
 
           {/* Focus ring animation */}
@@ -99,7 +107,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {(error || helperText) && (
           <div className="mt-2 flex items-start space-x-1">
             {error && (
-              <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+              <AlertCircle
+                className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0"
+                data-testid="alert-circle"
+              />
             )}
             <p
               className={cn(

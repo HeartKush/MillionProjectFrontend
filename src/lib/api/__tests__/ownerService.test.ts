@@ -47,6 +47,7 @@ describe("OwnerService", () => {
         address: "123 Main St",
         photo: "photo1.jpg",
         birthday: "1990-01-01T00:00:00.000Z",
+        createdAt: "2024-01-01T00:00:00Z",
       },
       {
         idOwner: "2",
@@ -54,6 +55,7 @@ describe("OwnerService", () => {
         address: "456 Oak Ave",
         photo: "photo2.jpg",
         birthday: "1985-05-15T00:00:00.000Z",
+        createdAt: "2024-01-01T00:00:00Z",
       },
     ];
 
@@ -96,7 +98,7 @@ describe("OwnerService", () => {
       address: "123 Main St",
       photo: "photo1.jpg",
       birthday: "1990-01-01T00:00:00.000Z",
-      properties: [],
+      createdAt: "2024-01-01T00:00:00Z",
     };
 
     it("should get owner by id successfully", async () => {

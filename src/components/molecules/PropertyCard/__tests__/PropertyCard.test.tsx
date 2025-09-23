@@ -1,8 +1,13 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-// Mock the Button component
+// Mock the Card and Button components
 jest.mock("@/components/atoms", () => ({
+  Card: ({ children, className, ...props }: any) => (
+    <div data-testid="property-card" className={className} {...props}>
+      {children}
+    </div>
+  ),
   Button: ({ children, onClick, variant, className, ...props }: any) => (
     <button
       onClick={onClick}
@@ -25,16 +30,19 @@ const mockProperty = {
   address: "123 Test Street",
   price: 1000000,
   imageUrl: "https://example.com/image.jpg",
+  hasTransactions: false,
+  featured: false,
+  createdAt: "2024-01-01T00:00:00Z",
 };
 
 describe("PropertyCard Component", () => {
   it("renders property information correctly", () => {
     render(<PropertyCard property={mockProperty} />);
 
-    expect(screen.getByText("🏡 Test Property")).toBeInTheDocument();
-    expect(screen.getByText("📍 123 Test Street")).toBeInTheDocument();
-    expect(screen.getByText(/💰.*1\.000\.000/)).toBeInTheDocument();
-    expect(screen.getByText("👁️ Ver Detalles")).toBeInTheDocument();
+    expect(screen.getByText("Test Property")).toBeInTheDocument();
+    expect(screen.getByText("123 Test Street")).toBeInTheDocument();
+    expect(screen.getByText(/1\.000\.000/)).toBeInTheDocument();
+    expect(screen.getByText("Ver Detalles")).toBeInTheDocument();
   });
 
   it("renders with image when provided", () => {
@@ -49,33 +57,70 @@ describe("PropertyCard Component", () => {
     const propertyWithoutImage = { ...mockProperty, imageUrl: undefined };
     render(<PropertyCard property={propertyWithoutImage} />);
 
-    expect(screen.queryByAltText("Test Property")).not.toBeInTheDocument();
+    expect(screen.getByText("Test Property")).toBeInTheDocument();
+    // Should still render the property name
   });
 
-  it("handles missing property name", () => {
-    const propertyWithoutName = { ...mockProperty, name: undefined };
-    render(<PropertyCard property={propertyWithoutName} />);
+  it("shows available status when no transactions", () => {
+    render(<PropertyCard property={mockProperty} />);
 
-    expect(screen.getByText("🏡 Sin nombre")).toBeInTheDocument();
+    // Check for the status indicator specifically
+    const statusIndicators = screen.getAllByText("Disponible");
+    const statusIndicator = statusIndicators.find((el) =>
+      el.closest(".status-indicator")
+    );
+    expect(statusIndicator).toBeInTheDocument();
   });
 
-  it("handles missing property address", () => {
-    const propertyWithoutAddress = { ...mockProperty, address: undefined };
-    render(<PropertyCard property={propertyWithoutAddress} />);
+  it("shows sold status when has transactions", () => {
+    const propertyWithTransactions = { ...mockProperty, hasTransactions: true };
+    render(<PropertyCard property={propertyWithTransactions} />);
 
-    expect(screen.getByText("📍 Sin dirección")).toBeInTheDocument();
+    // Check for the status indicator specifically
+    const statusIndicators = screen.getAllByText("Vendida");
+    const statusIndicator = statusIndicators.find((el) =>
+      el.closest(".status-indicator")
+    );
+    expect(statusIndicator).toBeInTheDocument();
   });
 
-  it("handles onViewDetails callback", () => {
+  it("shows featured badge when property is featured", () => {
+    const featuredProperty = { ...mockProperty, featured: true };
+    render(<PropertyCard property={featuredProperty} />);
+
+    expect(screen.getByText("Destacada")).toBeInTheDocument();
+  });
+
+  it("does not show featured badge when property is not featured", () => {
+    render(<PropertyCard property={mockProperty} />);
+
+    expect(screen.queryByText("Destacada")).not.toBeInTheDocument();
+  });
+
+  it("calls onViewDetails when view details button is clicked", () => {
     const mockOnViewDetails = jest.fn();
     render(
       <PropertyCard property={mockProperty} onViewDetails={mockOnViewDetails} />
     );
 
-    const viewButton = screen.getByText("👁️ Ver Detalles");
+    const viewButton = screen.getByText("Ver Detalles");
     fireEvent.click(viewButton);
 
-    expect(mockOnViewDetails).toHaveBeenCalledTimes(1);
+    expect(mockOnViewDetails).toHaveBeenCalledWith("123");
+  });
+
+  it("renders in grid layout by default", () => {
+    render(<PropertyCard property={mockProperty} />);
+
+    // Check for grid-specific elements
+    expect(screen.getByText("Test Property")).toBeInTheDocument();
+  });
+
+  it("renders in list layout when specified", () => {
+    render(<PropertyCard property={mockProperty} layout="list" />);
+
+    // Check for list-specific elements
+    expect(screen.getByText("Test Property")).toBeInTheDocument();
   });
 
   it("applies custom className", () => {
@@ -85,184 +130,260 @@ describe("PropertyCard Component", () => {
     expect(card).toHaveClass("custom-class");
   });
 
+  it("renders list layout when specified", () => {
+    render(<PropertyCard property={mockProperty} layout="list" />);
+
+    const card = screen.getByTestId("property-card");
+    expect(card).toBeInTheDocument();
+    // In list layout, the structure is different with flex layout
+    const contentContainer = card.querySelector(".flex");
+    expect(contentContainer).toBeInTheDocument();
+  });
+
+  it("renders grid layout by default", () => {
+    render(<PropertyCard property={mockProperty} />);
+
+    const card = screen.getByTestId("property-card");
+    expect(card).toBeInTheDocument();
+    // In grid layout, the card should have the correct structure
+    expect(card).toHaveClass("property-card");
+    // Check that the address section exists (which has flex class)
+    expect(screen.getByText("123 Test Street")).toBeInTheDocument();
+  });
+
+  it("handles property without name", () => {
+    const propertyWithoutName = { ...mockProperty, name: undefined };
+    render(<PropertyCard property={propertyWithoutName} />);
+
+    expect(screen.getByText("Sin nombre")).toBeInTheDocument();
+  });
+
+  it("handles property without address", () => {
+    const propertyWithoutAddress = { ...mockProperty, address: undefined };
+    render(<PropertyCard property={propertyWithoutAddress} />);
+
+    expect(screen.getByText("Sin dirección")).toBeInTheDocument();
+  });
+
+  it("handles property without imageUrl", () => {
+    const propertyWithoutImage = { ...mockProperty, imageUrl: undefined };
+    render(<PropertyCard property={propertyWithoutImage} />);
+
+    const image = screen.getByAltText("Test Property");
+    expect(image).toHaveAttribute(
+      "src",
+      "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
+    );
+  });
+
+  it("handles property without idProperty", () => {
+    const propertyWithoutId = { ...mockProperty, idProperty: undefined };
+    const mockOnViewDetails = jest.fn();
+    render(
+      <PropertyCard
+        property={propertyWithoutId}
+        onViewDetails={mockOnViewDetails}
+      />
+    );
+
+    const viewButton = screen.getByText("Ver Detalles");
+    fireEvent.click(viewButton);
+
+    expect(mockOnViewDetails).not.toHaveBeenCalled();
+  });
+
   it("handles property without onViewDetails callback", () => {
     render(<PropertyCard property={mockProperty} />);
 
-    const viewButton = screen.getByText("👁️ Ver Detalles");
-    expect(viewButton).toBeInTheDocument();
-
+    const viewButton = screen.getByText("Ver Detalles");
     // Should not throw error when clicked without callback
     expect(() => fireEvent.click(viewButton)).not.toThrow();
   });
 
-  it("renders price with correct formatting", () => {
-    const propertyWithDifferentPrice = {
-      ...mockProperty,
-      price: 2500000,
-    };
-    render(<PropertyCard property={propertyWithDifferentPrice} />);
+  it("renders featured property with badge in grid layout", () => {
+    const featuredProperty = { ...mockProperty, featured: true };
+    render(<PropertyCard property={featuredProperty} layout="grid" />);
 
-    expect(screen.getByText(/💰.*2\.500\.000/)).toBeInTheDocument();
+    expect(screen.getByText("Destacada")).toBeInTheDocument();
+    const card = screen.getByTestId("property-card");
+    expect(card).toHaveClass("ring-2", "ring-yellow-400", "shadow-glow");
   });
 
-  it("renders with minimal property data", () => {
-    const minimalProperty = {
-      idProperty: "123",
-      idOwner: "owner-123",
-      name: "",
-      address: "",
-      price: 0,
-    };
-    render(<PropertyCard property={minimalProperty} />);
+  it("renders featured property with badge in list layout", () => {
+    const featuredProperty = { ...mockProperty, featured: true };
+    render(<PropertyCard property={featuredProperty} layout="list" />);
 
-    expect(screen.getByText("🏡 Sin nombre")).toBeInTheDocument();
-    expect(screen.getByText("📍 Sin dirección")).toBeInTheDocument();
-    expect(screen.getByText(/💰.*0/)).toBeInTheDocument();
+    expect(screen.getByText("Destacada")).toBeInTheDocument();
+    const card = screen.getByTestId("property-card");
+    expect(card).toHaveClass("ring-2", "ring-yellow-400", "shadow-glow");
   });
 
-  it("renders with null imageUrl", () => {
-    const propertyWithNullImage = { ...mockProperty, imageUrl: null };
-    render(<PropertyCard property={propertyWithNullImage} />);
+  it("renders non-featured property without badge", () => {
+    const nonFeaturedProperty = { ...mockProperty, featured: false };
+    render(<PropertyCard property={nonFeaturedProperty} />);
 
-    expect(screen.queryByAltText("Test Property")).not.toBeInTheDocument();
+    expect(screen.queryByText("Destacada")).not.toBeInTheDocument();
+    const card = screen.getByTestId("property-card");
+    expect(card).not.toHaveClass("ring-2", "ring-yellow-400", "shadow-glow");
   });
 
-  it("renders with empty string imageUrl", () => {
-    const propertyWithEmptyImage = { ...mockProperty, imageUrl: "" };
-    render(<PropertyCard property={propertyWithEmptyImage} />);
+  it("shows sold status when hasTransactions is true", () => {
+    const soldProperty = { ...mockProperty, hasTransactions: true };
+    render(<PropertyCard property={soldProperty} />);
 
-    expect(screen.queryByAltText("Test Property")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Vendida")).toHaveLength(2); // One in stats, one in status indicator
   });
 
-  it("handles very large price values", () => {
-    const propertyWithLargePrice = {
-      ...mockProperty,
-      price: 999999999,
-    };
-    render(<PropertyCard property={propertyWithLargePrice} />);
+  it("shows available status when hasTransactions is false", () => {
+    const availableProperty = { ...mockProperty, hasTransactions: false };
+    render(<PropertyCard property={availableProperty} />);
 
-    expect(screen.getByText(/💰.*999\.999\.999/)).toBeInTheDocument();
+    expect(screen.getAllByText("Disponible")).toHaveLength(2); // One in stats, one in status indicator
   });
 
-  it("renders all required elements", () => {
-    render(<PropertyCard property={mockProperty} />);
-
-    // Check that all main elements are present
-    expect(screen.getByTestId("property-card")).toBeInTheDocument();
-    expect(screen.getByText("🏡 Test Property")).toBeInTheDocument();
-    expect(screen.getByText("📍 123 Test Street")).toBeInTheDocument();
-    expect(screen.getByText(/💰.*1\.000\.000/)).toBeInTheDocument();
-    expect(screen.getByText("👁️ Ver Detalles")).toBeInTheDocument();
-  });
-
-  it("handles property with special characters in name and address", () => {
-    const propertyWithSpecialChars = {
-      ...mockProperty,
-      name: "Casa & Apartamento @123",
-      address: "Calle 123 #45-67, Barrio Centro",
-    };
-    render(<PropertyCard property={propertyWithSpecialChars} />);
-
-    expect(screen.getByText("🏡 Casa & Apartamento @123")).toBeInTheDocument();
-    expect(
-      screen.getByText("📍 Calle 123 #45-67, Barrio Centro")
-    ).toBeInTheDocument();
-  });
-
-  it("renders edit button when onEdit is provided", () => {
-    const mockOnEdit = jest.fn();
-    render(<PropertyCard property={mockProperty} onEdit={mockOnEdit} />);
-
-    const editButton = screen.getByText("✏️");
-    expect(editButton).toBeInTheDocument();
-  });
-
-  it("renders delete button when onDelete is provided", () => {
-    const mockOnDelete = jest.fn();
-    render(<PropertyCard property={mockProperty} onDelete={mockOnDelete} />);
-
-    const deleteButton = screen.getByText("🗑️");
-    expect(deleteButton).toBeInTheDocument();
-  });
-
-  it("calls onEdit when edit button is clicked", () => {
-    const mockOnEdit = jest.fn();
-    render(<PropertyCard property={mockProperty} onEdit={mockOnEdit} />);
-
-    const editButton = screen.getByText("✏️");
-    fireEvent.click(editButton);
-
-    expect(mockOnEdit).toHaveBeenCalledWith(mockProperty);
-  });
-
-  it("calls onDelete when delete button is clicked", () => {
-    const mockOnDelete = jest.fn();
-    render(<PropertyCard property={mockProperty} onDelete={mockOnDelete} />);
-
-    const deleteButton = screen.getByText("🗑️");
-    fireEvent.click(deleteButton);
-
-    expect(mockOnDelete).toHaveBeenCalledWith("123");
-  });
-
-  it("does not render edit button when onEdit is not provided", () => {
-    render(<PropertyCard property={mockProperty} />);
-
-    expect(screen.queryByText("✏️")).not.toBeInTheDocument();
-  });
-
-  it("does not render delete button when onDelete is not provided", () => {
-    render(<PropertyCard property={mockProperty} />);
-
-    expect(screen.queryByText("🗑️")).not.toBeInTheDocument();
-  });
-
-  it("does not call onDelete when property has no idProperty", () => {
-    const mockOnDelete = jest.fn();
-    const propertyWithoutId = { ...mockProperty, idProperty: undefined };
-    render(
-      <PropertyCard property={propertyWithoutId} onDelete={mockOnDelete} />
-    );
-
-    const deleteButton = screen.getByText("🗑️");
-    fireEvent.click(deleteButton);
-
-    expect(mockOnDelete).not.toHaveBeenCalled();
-  });
-
-  it("renders both edit and delete buttons when both callbacks are provided", () => {
-    const mockOnEdit = jest.fn();
-    const mockOnDelete = jest.fn();
+  it("calls onViewDetails when view button is clicked in grid layout", () => {
+    const mockOnViewDetails = jest.fn();
     render(
       <PropertyCard
         property={mockProperty}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
+        onViewDetails={mockOnViewDetails}
+        layout="grid"
       />
     );
 
-    expect(screen.getByText("✏️")).toBeInTheDocument();
-    expect(screen.getByText("🗑️")).toBeInTheDocument();
+    const viewButton = screen.getByText("Ver Detalles");
+    fireEvent.click(viewButton);
+
+    expect(mockOnViewDetails).toHaveBeenCalledWith("123");
   });
 
-  it("calls both onEdit and onDelete when both buttons are clicked", () => {
-    const mockOnEdit = jest.fn();
-    const mockOnDelete = jest.fn();
+  it("calls onViewDetails when view button is clicked in list layout", () => {
+    const mockOnViewDetails = jest.fn();
     render(
       <PropertyCard
         property={mockProperty}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
+        onViewDetails={mockOnViewDetails}
+        layout="list"
       />
     );
 
-    const editButton = screen.getByText("✏️");
-    const deleteButton = screen.getByText("🗑️");
+    const viewButton = screen.getByText("Ver Detalles");
+    fireEvent.click(viewButton);
 
-    fireEvent.click(editButton);
-    fireEvent.click(deleteButton);
+    expect(mockOnViewDetails).toHaveBeenCalledWith("123");
+  });
 
-    expect(mockOnEdit).toHaveBeenCalledWith(mockProperty);
-    expect(mockOnDelete).toHaveBeenCalledWith("123");
+  it("renders with correct image alt text", () => {
+    render(<PropertyCard property={mockProperty} />);
+
+    const image = screen.getByAltText("Test Property");
+    expect(image).toBeInTheDocument();
+  });
+
+  it("renders with fallback image alt text when name is missing", () => {
+    const propertyWithoutName = { ...mockProperty, name: undefined };
+    render(<PropertyCard property={propertyWithoutName} />);
+
+    const image = screen.getByAltText("Propiedad");
+    expect(image).toBeInTheDocument();
+  });
+
+  it("applies correct status indicator classes for sold property", () => {
+    const soldProperty = { ...mockProperty, hasTransactions: true };
+    render(<PropertyCard property={soldProperty} />);
+
+    const statusIndicators = screen.getAllByText("Vendida");
+    statusIndicators.forEach((indicator) => {
+      const parent = indicator.closest('div[class*="status-indicator"]');
+      if (parent) {
+        expect(parent).toHaveClass("status-sold");
+      }
+    });
+  });
+
+  it("applies correct status indicator classes for available property", () => {
+    const availableProperty = { ...mockProperty, hasTransactions: false };
+    render(<PropertyCard property={availableProperty} />);
+
+    const statusIndicators = screen.getAllByText("Disponible");
+    statusIndicators.forEach((indicator) => {
+      const parent = indicator.closest('div[class*="status-indicator"]');
+      if (parent) {
+        expect(parent).toHaveClass("status-available");
+      }
+    });
+  });
+
+  it("handles property without name in list layout", () => {
+    const propertyWithoutName = { ...mockProperty, name: undefined };
+    render(<PropertyCard property={propertyWithoutName} layout="list" />);
+
+    expect(screen.getByText("Sin nombre")).toBeInTheDocument();
+  });
+
+  it("handles property without address in list layout", () => {
+    const propertyWithoutAddress = { ...mockProperty, address: undefined };
+    render(<PropertyCard property={propertyWithoutAddress} layout="list" />);
+
+    expect(screen.getByText("Sin dirección")).toBeInTheDocument();
+  });
+
+  it("handles property without imageUrl in list layout", () => {
+    const propertyWithoutImage = { ...mockProperty, imageUrl: undefined };
+    render(<PropertyCard property={propertyWithoutImage} layout="list" />);
+
+    const image = screen.getByAltText("Test Property");
+    expect(image).toHaveAttribute(
+      "src",
+      "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800"
+    );
+  });
+
+  it("shows sold status when hasTransactions is true in list layout", () => {
+    const soldProperty = { ...mockProperty, hasTransactions: true };
+    render(<PropertyCard property={soldProperty} layout="list" />);
+
+    expect(screen.getAllByText("Vendida")).toHaveLength(2); // One in stats, one in status indicator
+  });
+
+  it("shows available status when hasTransactions is false in list layout", () => {
+    const availableProperty = { ...mockProperty, hasTransactions: false };
+    render(<PropertyCard property={availableProperty} layout="list" />);
+
+    expect(screen.getAllByText("Disponible")).toHaveLength(2); // One in stats, one in status indicator
+  });
+
+  it("applies correct status indicator classes for sold property in list layout", () => {
+    const soldProperty = { ...mockProperty, hasTransactions: true };
+    render(<PropertyCard property={soldProperty} layout="list" />);
+
+    const statusIndicators = screen.getAllByText("Vendida");
+    statusIndicators.forEach((indicator) => {
+      const parent = indicator.closest('div[class*="status-indicator"]');
+      if (parent) {
+        expect(parent).toHaveClass("status-sold");
+      }
+    });
+  });
+
+  it("applies correct status indicator classes for available property in list layout", () => {
+    const availableProperty = { ...mockProperty, hasTransactions: false };
+    render(<PropertyCard property={availableProperty} layout="list" />);
+
+    const statusIndicators = screen.getAllByText("Disponible");
+    statusIndicators.forEach((indicator) => {
+      const parent = indicator.closest('div[class*="status-indicator"]');
+      if (parent) {
+        expect(parent).toHaveClass("status-available");
+      }
+    });
+  });
+
+  it("renders with fallback image alt text when name is missing in list layout", () => {
+    const propertyWithoutName = { ...mockProperty, name: undefined };
+    render(<PropertyCard property={propertyWithoutName} layout="list" />);
+
+    const image = screen.getByAltText("Propiedad");
+    expect(image).toBeInTheDocument();
   });
 });

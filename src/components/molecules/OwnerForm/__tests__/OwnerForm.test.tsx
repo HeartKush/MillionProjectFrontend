@@ -117,6 +117,7 @@ describe("OwnerForm Component", () => {
       address: "123 Main St",
       birthday: "1990-01-01T00:00:00.000Z",
       photo: "https://example.com/photo.jpg",
+      createdAt: "2024-01-01T00:00:00Z",
     };
 
     render(
@@ -186,6 +187,7 @@ describe("OwnerForm Component", () => {
       address: "123 Main St",
       birthday: "1990-01-01T00:00:00.000Z",
       photo: "https://example.com/photo.jpg",
+      createdAt: "2024-01-01T00:00:00Z",
     };
 
     render(

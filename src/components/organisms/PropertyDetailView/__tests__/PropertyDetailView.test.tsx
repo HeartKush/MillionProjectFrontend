@@ -3,31 +3,34 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 // Mock the dependencies
 jest.mock("@/components/atoms", () => ({
-  LoadingSpinner: ({ size }: any) => (
-    <div data-testid="loading-spinner">Loading...</div>
-  ),
-  ErrorMessage: ({ message, variant }: any) => (
-    <div data-testid="error-message">{message}</div>
+  Button: ({ children, onClick, ...props }: any) => (
+    <button onClick={onClick} {...props}>
+      {children}
+    </button>
   ),
 }));
 
 jest.mock("@/components/molecules", () => ({
-  PropertyDetail: ({ property }: any) => (
+  PropertyDetail: ({ property, onEdit, onDelete, ownerName }: any) => (
     <div data-testid="property-detail">
-      <h1>{property.name}</h1>
-      <p>{property.address}</p>
-      <p>Price: {property.price}</p>
+      {property ? (
+        <>
+          <h1>{property.name}</h1>
+          <p>{property.address}</p>
+          <p>Price: {property.price}</p>
+          {ownerName && <p>Owner: {ownerName}</p>}
+          {onEdit !== undefined && <button onClick={onEdit}>Edit</button>}
+          {onDelete !== undefined && <button onClick={onDelete}>Delete</button>}
+        </>
+      ) : (
+        <p>No property data</p>
+      )}
     </div>
   ),
 }));
 
-jest.mock("@/lib/hooks", () => ({
-  useProperty: jest.fn(),
-}));
-
 // Import the real component
 import { PropertyDetailView } from "../PropertyDetailView";
-import { useProperty } from "@/lib/hooks";
 
 const mockProperty = {
   idProperty: "prop-1",
@@ -38,55 +41,20 @@ const mockProperty = {
   imageUrl: "https://example.com/image.jpg",
   year: 2020,
   codeInternal: "PROP-001",
+  createdAt: "2024-01-01T00:00:00Z",
 };
 
 describe("PropertyDetailView Component", () => {
-  const mockUseProperty = useProperty as jest.MockedFunction<
-    typeof useProperty
-  >;
-
-  const createMockQueryResult = (overrides: any = {}) => ({
-    data: mockProperty,
-    isLoading: false,
-    error: null,
-    refetch: jest.fn(),
-    isError: false,
-    isPending: false,
-    isLoadingError: false,
-    isRefetchError: false,
-    isSuccess: true,
-    isFetching: false,
-    isRefetching: false,
-    isStale: false,
-    isFetched: true,
-    isFetchedAfterMount: true,
-    isPlaceholderData: false,
-    isPreviousData: false,
-    status: "success" as const,
-    fetchStatus: "idle" as const,
-    dataUpdatedAt: Date.now(),
-    errorUpdatedAt: 0,
-    failureCount: 0,
-    failureReason: null,
-    errorUpdateCount: 0,
-    isFetchingNextPage: false,
-    isFetchingPreviousPage: false,
-    hasNextPage: false,
-    hasPreviousPage: false,
-    fetchNextPage: jest.fn(),
-    fetchPreviousPage: jest.fn(),
-    remove: jest.fn(),
-    ...overrides,
-  });
+  const mockOnBack = jest.fn();
+  const mockOnEdit = jest.fn();
+  const mockOnDelete = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("renders property detail view", () => {
-    mockUseProperty.mockReturnValue(createMockQueryResult());
-
-    render(<PropertyDetailView propertyId="prop-1" />);
+    render(<PropertyDetailView property={mockProperty} onBack={mockOnBack} />);
 
     expect(screen.getByTestId("property-detail")).toBeInTheDocument();
     expect(screen.getByText("Test Property")).toBeInTheDocument();
@@ -94,64 +62,16 @@ describe("PropertyDetailView Component", () => {
   });
 
   it("applies custom className", () => {
-    mockUseProperty.mockReturnValue(createMockQueryResult());
-
-    render(<PropertyDetailView propertyId="prop-1" className="custom-class" />);
-
-    const view = screen
-      .getByTestId("property-detail")
-      .closest("div")?.parentElement;
-    expect(view).toHaveClass("custom-class");
-  });
-
-  it("handles loading state", () => {
-    mockUseProperty.mockReturnValue(
-      createMockQueryResult({
-        data: null,
-        isLoading: true,
-        isSuccess: false,
-        status: "pending" as const,
-      })
+    render(
+      <PropertyDetailView property={mockProperty} className="custom-class" />
     );
 
-    render(<PropertyDetailView propertyId="prop-1" />);
-
-    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
-  });
-
-  it("handles error state", () => {
-    const mockRefetch = jest.fn();
-    mockUseProperty.mockReturnValue(
-      createMockQueryResult({
-        data: null,
-        isLoading: false,
-        error: new Error("Test error"),
-        refetch: mockRefetch,
-        isError: true,
-        isSuccess: false,
-        status: "error" as const,
-      })
-    );
-
-    render(<PropertyDetailView propertyId="prop-1" />);
-
-    expect(screen.getByTestId("error-message")).toBeInTheDocument();
-    expect(screen.getByText("Reintentar")).toBeInTheDocument();
-  });
-
-  it("handles property not found", () => {
-    mockUseProperty.mockReturnValue(createMockQueryResult({ data: null }));
-
-    render(<PropertyDetailView propertyId="prop-1" />);
-
-    expect(screen.getByText("Propiedad no encontrada")).toBeInTheDocument();
+    const container = screen.getByTestId("property-detail").parentElement;
+    expect(container).toHaveClass("custom-class");
   });
 
   it("handles back button", () => {
-    const mockOnBack = jest.fn();
-    mockUseProperty.mockReturnValue(createMockQueryResult());
-
-    render(<PropertyDetailView propertyId="prop-1" onBack={mockOnBack} />);
+    render(<PropertyDetailView property={mockProperty} onBack={mockOnBack} />);
 
     const backButton = screen.getByText("Volver a la lista");
     fireEvent.click(backButton);
@@ -159,60 +79,48 @@ describe("PropertyDetailView Component", () => {
     expect(mockOnBack).toHaveBeenCalledTimes(1);
   });
 
-  it("handles retry button click", () => {
-    const mockRefetch = jest.fn();
-    mockUseProperty.mockReturnValue(
-      createMockQueryResult({
-        data: null,
-        isLoading: false,
-        error: new Error("Test error"),
-        refetch: mockRefetch,
-        isError: true,
-        isSuccess: false,
-        status: "error" as const,
-      })
-    );
+  it("handles edit button", () => {
+    render(<PropertyDetailView property={mockProperty} onEdit={mockOnEdit} />);
 
-    render(<PropertyDetailView propertyId="prop-1" />);
+    const editButton = screen.getByText("Edit");
+    fireEvent.click(editButton);
 
-    const retryButton = screen.getByText("Reintentar");
-    fireEvent.click(retryButton);
-
-    expect(mockRefetch).toHaveBeenCalledTimes(1);
+    expect(mockOnEdit).toHaveBeenCalledWith("prop-1");
   });
 
-  it("handles back button in error state", () => {
-    const mockOnBack = jest.fn();
-    const mockRefetch = jest.fn();
-    mockUseProperty.mockReturnValue(
-      createMockQueryResult({
-        data: null,
-        isLoading: false,
-        error: new Error("Test error"),
-        refetch: mockRefetch,
-        isError: true,
-        isSuccess: false,
-        status: "error" as const,
-      })
+  it("handles delete button", () => {
+    render(
+      <PropertyDetailView property={mockProperty} onDelete={mockOnDelete} />
     );
 
-    render(<PropertyDetailView propertyId="prop-1" onBack={mockOnBack} />);
+    const deleteButton = screen.getByText("Delete");
+    fireEvent.click(deleteButton);
 
-    const backButton = screen.getByText("Volver");
-    fireEvent.click(backButton);
-
-    expect(mockOnBack).toHaveBeenCalledTimes(1);
+    expect(mockOnDelete).toHaveBeenCalledWith("prop-1");
   });
 
-  it("handles back button when property not found", () => {
-    const mockOnBack = jest.fn();
-    mockUseProperty.mockReturnValue(createMockQueryResult({ data: null }));
+  it("displays owner name when provided", () => {
+    render(<PropertyDetailView property={mockProperty} ownerName="John Doe" />);
 
-    render(<PropertyDetailView propertyId="prop-1" onBack={mockOnBack} />);
+    expect(screen.getByText("Owner: John Doe")).toBeInTheDocument();
+  });
 
-    const backButton = screen.getByText("Volver a la lista");
-    fireEvent.click(backButton);
+  it("renders without back button when onBack is not provided", () => {
+    render(<PropertyDetailView property={mockProperty} />);
 
-    expect(mockOnBack).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Volver a la lista")).not.toBeInTheDocument();
+  });
+
+  it("renders without edit/delete buttons when not provided", () => {
+    render(<PropertyDetailView property={mockProperty} />);
+
+    // The component should still render the property details
+    expect(screen.getByText("Test Property")).toBeInTheDocument();
+  });
+
+  it("handles null property", () => {
+    render(<PropertyDetailView property={null as any} />);
+
+    expect(screen.getByText("No property data")).toBeInTheDocument();
   });
 });

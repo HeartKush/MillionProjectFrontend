@@ -83,14 +83,6 @@ export const OwnerDetail: React.FC<OwnerDetailProps> = ({
                       {owner.address || "No especificada"}
                     </p>
                   </div>
-                  {owner.phone && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Teléfono
-                      </label>
-                      <p className="text-gray-900">{owner.phone}</p>
-                    </div>
-                  )}
                 </div>
               </div>
 

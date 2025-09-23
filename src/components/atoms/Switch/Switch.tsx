@@ -9,6 +9,7 @@ interface SwitchProps {
   label?: string;
   className?: string;
   "data-testid"?: string;
+  "aria-label"?: string;
 }
 
 /**
@@ -24,6 +25,7 @@ export const Switch: React.FC<SwitchProps> = ({
   label,
   className,
   "data-testid": dataTestId,
+  "aria-label": ariaLabel,
 }) => {
   const handleToggle = () => {
     if (!disabled && onChange) {
@@ -48,6 +50,7 @@ export const Switch: React.FC<SwitchProps> = ({
         role="switch"
         aria-checked={checked}
         aria-disabled={disabled}
+        aria-label={ariaLabel}
       >
         <span
           className={cn(

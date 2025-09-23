@@ -132,7 +132,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
     deleteTraceMutation.isPending;
 
   return (
-    <div className={className}>
+    <div className={className} data-testid="property-detail">
       {/* Property detail card with original design */}
       <div className="card-elevated p-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

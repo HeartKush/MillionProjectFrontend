@@ -5,4 +5,5 @@ import { redirect } from "next/navigation";
  */
 export default function HomePage() {
   redirect("/propiedades");
+  return null; // This line will never be reached, but satisfies TypeScript
 }
